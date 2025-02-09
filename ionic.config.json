@@ -1,0 +1,8 @@
+{
+  "name": "nakheel",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "70e934e7"
+}
