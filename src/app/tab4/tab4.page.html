@@ -1,0 +1,116 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>تعزيزات الرصيد</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="ابحث باسم الموظف أو القسم"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-wrap" *ngIf="!loading">
+    <p class="hint-banner">
+      تعزيزات الرصيد هي العمليات النقدية (CASH) التي ينفذها الموظفون على حسابات
+      الأقسام/الوكلاء الداخليين.
+    </p>
+
+    <ion-grid class="kpi-grid">
+      <ion-row>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="عدد الموظفين"
+            [value]="totalEmployees | amountFormat"
+            icon="person-outline"
+            color="primary"
+          ></app-kpi-card>
+        </ion-col>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="عدد عمليات التعزيز"
+            [value]="totalOps | amountFormat"
+            icon="repeat-outline"
+            color="tertiary"
+          ></app-kpi-card>
+        </ion-col>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="إجمالي مبالغ التعزيز"
+            [value]="compactAmount(totalAmount) + ' د.ع'"
+            icon="wallet-outline"
+            color="success"
+          ></app-kpi-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div class="result-count">{{ visible.length }} من أصل {{ all.length }} موظف</div>
+
+    <div class="emp-grid">
+      <ion-card class="emp-card" *ngFor="let g of visible">
+        <div class="emp-top" (click)="toggleExpand(g.employee)">
+          <div class="emp-name">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            {{ g.employee }}
+          </div>
+          <ion-icon
+            class="chevron"
+            [name]="expandedEmployee === g.employee ? 'chevron-up-outline' : 'chevron-down-outline'"
+          ></ion-icon>
+        </div>
+
+        <div class="emp-agents">
+          <ion-badge color="medium" *ngFor="let a of g.agents">
+            {{ a.agent }} · {{ a.count }}
+          </ion-badge>
+        </div>
+
+        <div class="emp-bar-bg">
+          <div class="emp-bar-fill" [style.width.%]="(g.totalCount / maxCount()) * 100"></div>
+        </div>
+
+        <div class="emp-stats">
+          <div class="stat">
+            <span class="stat-value">{{ g.totalCount }}</span>
+            <span class="stat-label">عملية</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ compactAmount(g.totalAmount) }}</span>
+            <span class="stat-label">د.ع</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value date">{{ g.firstDate }}</span>
+            <span class="stat-label">أول عملية</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value date">{{ g.lastDate }}</span>
+            <span class="stat-label">آخر عملية</span>
+          </div>
+        </div>
+
+        <div class="emp-detail" *ngIf="expandedEmployee === g.employee">
+          <div class="detail-row" *ngFor="let t of opsFor(g.employee)">
+            <span class="detail-pnr">{{ t.pnr }}</span>
+            <span class="detail-date">{{ t.date }} · {{ t.time }}</span>
+            <span class="detail-amount" [class.negative]="t.amount < 0">
+              {{ t.amount | amountFormat }} {{ t.currency }}
+            </span>
+          </div>
+        </div>
+      </ion-card>
+
+      <div class="empty-state" *ngIf="!visible.length">
+        <ion-icon name="wallet-outline"></ion-icon>
+        <p>لا توجد نتائج مطابقة</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>جارِ تحميل بيانات التعزيزات...</p>
+  </div>
+</ion-content>

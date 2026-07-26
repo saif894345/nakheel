@@ -1,17 +1,73 @@
 <ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>الوكلاء</ion-title>
+  </ion-toolbar>
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-searchbar
+      placeholder="ابحث باسم الوكيل"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="sortKey" (ionChange)="setSort($any($event.detail.value))">
+      <ion-segment-button value="total">
+        <ion-label>الأكثر معاملات</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="amountIQD">
+        <ion-label>الأعلى مبلغاً</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="approvalRate">
+        <ion-label>الأعلى قبولاً</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="result-count" *ngIf="!loading">{{ visible.length }} وكيل</div>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <div class="agents-grid" *ngIf="!loading">
+    <ion-card class="agent-card" *ngFor="let a of visible">
+      <div class="agent-top">
+        <div class="agent-name">{{ a.agent }}</div>
+        <ion-badge [color]="a.approvalRate >= 90 ? 'success' : a.approvalRate >= 70 ? 'warning' : 'danger'">
+          {{ a.approvalRate }}%
+        </ion-badge>
+      </div>
+
+      <div class="agent-bar-bg">
+        <div class="agent-bar-fill" [style.width.%]="(a.total / maxTotal()) * 100"></div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat">
+          <span class="stat-value">{{ a.total }}</span>
+          <span class="stat-label">معاملة</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value success">{{ a.approved }}</span>
+          <span class="stat-label">مقبولة</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value danger">{{ a.declined }}</span>
+          <span class="stat-label">مرفوضة</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ compactAmount(a.amountIQD) }}</span>
+          <span class="stat-label">د.ع</span>
+        </div>
+      </div>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="!visible.length">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>لا يوجد وكلاء مطابقون</p>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>جارِ تحميل بيانات الوكلاء...</p>
+  </div>
 </ion-content>
