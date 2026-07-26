@@ -60,6 +60,15 @@ export interface CurrencyStat {
   count: number;
 }
 
+export interface CashTopup {
+  employee: string;
+  agent: string;
+  count: number;
+  netAmount: number;
+  firstDate: string;
+  lastDate: string;
+}
+
 export interface DashboardData {
   kpis: DashboardKpis;
   daily: DailyPoint[];
@@ -69,6 +78,7 @@ export interface DashboardData {
   errors: ErrorStat[];
   hourly: number[];
   currencyBreakdown: CurrencyStat[];
+  cashTopups: CashTopup[];
   generatedAt: string;
 }
 
