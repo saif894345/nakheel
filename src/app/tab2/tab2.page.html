@@ -1,17 +1,85 @@
 <ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>المعاملات</ion-title>
+  </ion-toolbar>
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-searchbar
+      placeholder="ابحث برقم الحجز (PNR) أو اسم الوكيل"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment
+      [value]="statusFilter"
+      (ionChange)="setStatusFilter($any($event.detail.value))"
+    >
+      <ion-segment-button value="all">
+        <ion-label>الكل</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Approved">
+        <ion-label>مقبولة</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Declined">
+        <ion-label>مرفوضة</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <ion-select
+      slot="end"
+      interface="popover"
+      [value]="typeFilter"
+      (ionChange)="setTypeFilter($event)"
+      class="type-select"
+    >
+      <ion-select-option value="all">كل الأنواع</ion-select-option>
+      <ion-select-option value="Auth">دفع</ion-select-option>
+      <ion-select-option value="Void">إلغاء</ion-select-option>
+      <ion-select-option value="Credit">استرجاع</ion-select-option>
+    </ion-select>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="result-count" *ngIf="!loading">
+    {{ filtered.length }} من أصل {{ all.length }} معاملة
+  </div>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <ion-list *ngIf="!loading" class="tx-list">
+    <ion-card class="tx-card" *ngFor="let t of visible">
+      <div class="tx-row-top">
+        <div class="tx-pnr">{{ t.pnr }}</div>
+        <ion-badge [color]="t.status === 'Approved' ? 'success' : 'danger'">
+          {{ t.status === 'Approved' ? 'مقبولة' : 'مرفوضة' }}
+        </ion-badge>
+      </div>
+      <div class="tx-row-mid">
+        <span class="tx-agent">{{ t.agent }}</span>
+        <span class="tx-type">{{ typeLabel(t.type) }}</span>
+      </div>
+      <div class="tx-row-bottom">
+        <span class="tx-date">{{ t.date }} · {{ t.time }}</span>
+        <span class="tx-amount">{{ t.amount | amountFormat }} {{ t.currency }}</span>
+      </div>
+      <div class="tx-err" *ngIf="t.status === 'Declined' && t.errMessage">
+        {{ t.errMessage }}
+      </div>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="!visible.length">
+      <ion-icon name="file-tray-outline"></ion-icon>
+      <p>لا توجد نتائج مطابقة</p>
+    </div>
+  </ion-list>
+
+  <ion-infinite-scroll
+    *ngIf="visible.length < filtered.length"
+    (ionInfinite)="loadMore($event)"
+  >
+    <ion-infinite-scroll-content loadingText="جارِ تحميل المزيد..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>جارِ تحميل المعاملات...</p>
+  </div>
 </ion-content>

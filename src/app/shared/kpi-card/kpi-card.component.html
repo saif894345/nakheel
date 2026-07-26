@@ -1,0 +1,17 @@
+<div class="kpi-card" [class]="'kpi-' + color">
+  <div class="kpi-icon">
+    <ion-icon [name]="icon"></ion-icon>
+  </div>
+  <div class="kpi-body">
+    <div class="kpi-label">{{ label }}</div>
+    <div class="kpi-value">
+      {{ value }}
+      <ion-icon
+        *ngIf="trend"
+        class="kpi-trend"
+        [name]="trend === 'up' ? 'trending-up-outline' : 'trending-down-outline'"
+      ></ion-icon>
+    </div>
+    <div class="kpi-sub" *ngIf="sub">{{ sub }}</div>
+  </div>
+</div>

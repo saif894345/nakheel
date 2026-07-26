@@ -1,0 +1,86 @@
+.page-wrap {
+  padding: 4px 4px 24px;
+}
+
+.period-label {
+  margin: 4px 12px 8px;
+  color: var(--ion-color-medium);
+  font-size: 13px;
+}
+
+.kpi-grid,
+.content-grid {
+  ion-col {
+    padding: 6px;
+  }
+}
+
+.chart-card {
+  margin: 0 0 12px;
+}
+
+.card-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mini-segment {
+  max-width: 200px;
+}
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart-min-width {
+  min-width: 520px;
+}
+
+.reason-row {
+  margin-bottom: 14px;
+}
+
+.reason-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.reason-count {
+  font-weight: 700;
+  color: var(--ion-color-danger);
+}
+
+.reason-bar-bg {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.reason-bar-fill {
+  height: 100%;
+  background: var(--ion-color-danger);
+  border-radius: 4px;
+}
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 12px;
+  color: var(--ion-color-medium);
+}
+
+@media (min-width: 768px) {
+  .chart-min-width {
+    min-width: 100%;
+  }
+}
