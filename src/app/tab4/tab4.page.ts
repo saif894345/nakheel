@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
+import { MonthFilterService } from '../services/month-filter.service';
 import { CashTopup, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
+import { computeCashTopups, filterByMonth } from '../shared/utils/aggregate';
 
 interface EmployeeGroup {
   employee: string;
@@ -29,25 +31,28 @@ export class Tab4Page implements OnInit {
   totalAmount = 0;
   totalEmployees = 0;
 
-  private transactions: Transaction[] = [];
+  private monthScopedTx: Transaction[] = [];
   expandedEmployee: string | null = null;
   compactAmount = compactAmount;
 
-  constructor(private dataSvc: DashboardDataService) {}
+  constructor(
+    private dataSvc: DashboardDataService,
+    private filterSvc: MonthFilterService
+  ) {}
 
   ngOnInit(): void {
-    forkJoin({
-      data: this.dataSvc.getDashboardData(),
-      tx: this.dataSvc.getTransactions(),
-    }).subscribe(({ data, tx }) => {
-      this.transactions = tx;
-      this.all = this.groupByEmployee(data.cashTopups);
-      this.totalOps = data.cashTopups.reduce((s, c) => s + c.count, 0);
-      this.totalAmount = data.cashTopups.reduce((s, c) => s + c.netAmount, 0);
-      this.totalEmployees = this.all.length;
-      this.applyFilters();
-      this.loading = false;
-    });
+    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
+      ([tx, month]) => {
+        this.monthScopedTx = filterByMonth(tx, month);
+        const cashTopups = computeCashTopups(this.monthScopedTx);
+        this.all = this.groupByEmployee(cashTopups);
+        this.totalOps = cashTopups.reduce((s, c) => s + c.count, 0);
+        this.totalAmount = cashTopups.reduce((s, c) => s + c.netAmount, 0);
+        this.totalEmployees = this.all.length;
+        this.applyFilters();
+        this.loading = false;
+      }
+    );
   }
 
   private groupByEmployee(rows: CashTopup[]): EmployeeGroup[] {
@@ -96,7 +101,7 @@ export class Tab4Page implements OnInit {
   }
 
   opsFor(employee: string): Transaction[] {
-    return this.transactions
+    return this.monthScopedTx
       .filter((t) => t.vpos === 'CASH' && t.user === employee)
       .sort((a, b) => (a.date + a.time < b.date + b.time ? 1 : -1));
   }

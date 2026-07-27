@@ -1,0 +1,12 @@
+<ion-select
+  interface="popover"
+  [value]="month$ | async"
+  (ionChange)="onChange($event)"
+  class="month-select"
+  aria-label="اختر الشهر"
+>
+  <ion-select-option value="all">كل الفترة</ion-select-option>
+  <ion-select-option *ngFor="let m of months" [value]="m.value">
+    {{ m.label }} ({{ m.count }})
+  </ion-select-option>
+</ion-select>

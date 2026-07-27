@@ -1,8 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration } from 'chart.js/auto';
+import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
-import { DashboardData } from '../models/dashboard.model';
+import { MonthFilterService } from '../services/month-filter.service';
+import { DashboardKpis, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
+import {
+  computeAgents,
+  computeDaily,
+  computeErrors,
+  computeKpis,
+  computeVpos,
+  filterByMonth,
+} from '../shared/utils/aggregate';
 
 const COLORS = {
   primary: '#3880ff',
@@ -21,8 +31,12 @@ const COLORS = {
 })
 export class Tab1Page implements OnInit {
   loading = true;
-  data?: DashboardData;
+  kpis?: DashboardKpis;
+  errors: ReturnType<typeof computeErrors> = [];
   trendMode: 'daily' | 'weekly' = 'weekly';
+
+  private filtered: Transaction[] = [];
+  private dailyData: ReturnType<typeof computeDaily> = [];
 
   trendChartData?: ChartConfiguration['data'];
   trendChartOptions: ChartConfiguration['options'] = {};
@@ -35,17 +49,25 @@ export class Tab1Page implements OnInit {
 
   compactAmount = compactAmount;
 
-  constructor(private dataSvc: DashboardDataService) {}
+  constructor(
+    private dataSvc: DashboardDataService,
+    private filterSvc: MonthFilterService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSvc.getDashboardData().subscribe((data) => {
-      this.data = data;
-      this.buildStatusChart();
-      this.buildAgentsChart();
-      this.buildVposChart();
-      this.buildTrendChart();
-      this.loading = false;
-    });
+    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
+      ([tx, month]) => {
+        this.filtered = filterByMonth(tx, month);
+        this.kpis = computeKpis(this.filtered);
+        this.errors = computeErrors(this.filtered);
+        this.dailyData = computeDaily(this.filtered);
+        this.buildStatusChart();
+        this.buildAgentsChart();
+        this.buildVposChart();
+        this.buildTrendChart();
+        this.loading = false;
+      }
+    );
   }
 
   setTrendMode(mode: 'daily' | 'weekly'): void {
@@ -54,11 +76,10 @@ export class Tab1Page implements OnInit {
   }
 
   private buildTrendChart(): void {
-    if (!this.data) return;
     const points =
       this.trendMode === 'weekly'
-        ? this.toWeekly(this.data.daily)
-        : this.data.daily.map((d) => ({ label: d.date, total: d.total, amountIQD: d.amountIQD }));
+        ? this.toWeekly(this.dailyData)
+        : this.dailyData.map((d) => ({ label: d.date, total: d.total, amountIQD: d.amountIQD }));
 
     this.trendChartData = {
       labels: points.map((p) => p.label),
@@ -112,7 +133,7 @@ export class Tab1Page implements OnInit {
     };
   }
 
-  private toWeekly(daily: DashboardData['daily']): Array<{
+  private toWeekly(daily: typeof this.dailyData): Array<{
     label: string;
     total: number;
     amountIQD: number;
@@ -136,8 +157,8 @@ export class Tab1Page implements OnInit {
   }
 
   private buildStatusChart(): void {
-    if (!this.data) return;
-    const { approvedCount, declinedCount } = this.data.kpis;
+    if (!this.kpis) return;
+    const { approvedCount, declinedCount } = this.kpis;
     this.statusChartData = {
       labels: ['مقبولة', 'مرفوضة'],
       datasets: [
@@ -157,8 +178,8 @@ export class Tab1Page implements OnInit {
   }
 
   private buildAgentsChart(): void {
-    if (!this.data) return;
-    const top = [...this.data.agents].sort((a, b) => b.total - a.total).slice(0, 8).reverse();
+    const agents = computeAgents(this.filtered);
+    const top = [...agents].sort((a, b) => b.total - a.total).slice(0, 8).reverse();
     this.agentsChartData = {
       labels: top.map((a) => a.agent),
       datasets: [
@@ -181,8 +202,7 @@ export class Tab1Page implements OnInit {
   }
 
   private buildVposChart(): void {
-    if (!this.data) return;
-    const items = this.data.vpos;
+    const items = computeVpos(this.filtered);
     this.vposChartData = {
       labels: items.map((v) => this.vposLabel(v.vpos)),
       datasets: [
@@ -212,7 +232,7 @@ export class Tab1Page implements OnInit {
   }
 
   errorPercent(count: number): number {
-    if (!this.data) return 0;
-    return Math.round((count / this.data.kpis.declinedCount) * 100);
+    if (!this.kpis || !this.kpis.declinedCount) return 0;
+    return Math.round((count / this.kpis.declinedCount) * 100);
   }
 }

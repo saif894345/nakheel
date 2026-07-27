@@ -55,11 +55,6 @@ export interface ErrorStat {
   count: number;
 }
 
-export interface CurrencyStat {
-  currency: string;
-  count: number;
-}
-
 export interface CashTopup {
   employee: string;
   agent: string;
@@ -67,19 +62,6 @@ export interface CashTopup {
   netAmount: number;
   firstDate: string;
   lastDate: string;
-}
-
-export interface DashboardData {
-  kpis: DashboardKpis;
-  daily: DailyPoint[];
-  agents: AgentStat[];
-  vpos: VposStat[];
-  typeBreakdown: TypeStat[];
-  errors: ErrorStat[];
-  hourly: number[];
-  currencyBreakdown: CurrencyStat[];
-  cashTopups: CashTopup[];
-  generatedAt: string;
 }
 
 export interface Transaction {

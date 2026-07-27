@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
+import { MonthFilterService } from '../services/month-filter.service';
 import { AgentStat } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
+import { computeAgents, filterByMonth } from '../shared/utils/aggregate';
 
 type SortKey = 'total' | 'amountIQD' | 'approvalRate';
 
@@ -19,14 +22,19 @@ export class Tab3Page implements OnInit {
   sortKey: SortKey = 'total';
   compactAmount = compactAmount;
 
-  constructor(private dataSvc: DashboardDataService) {}
+  constructor(
+    private dataSvc: DashboardDataService,
+    private filterSvc: MonthFilterService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSvc.getDashboardData().subscribe((data) => {
-      this.all = data.agents;
-      this.applyFilters();
-      this.loading = false;
-    });
+    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
+      ([tx, month]) => {
+        this.all = computeAgents(filterByMonth(tx, month));
+        this.applyFilters();
+        this.loading = false;
+      }
+    );
   }
 
   onSearch(ev: CustomEvent): void {

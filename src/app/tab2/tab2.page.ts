@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
+import { MonthFilterService } from '../services/month-filter.service';
 import { Transaction } from '../models/dashboard.model';
+import { filterByMonth } from '../shared/utils/aggregate';
 
 const PAGE_SIZE = 30;
 
@@ -14,6 +17,7 @@ const PAGE_SIZE = 30;
 export class Tab2Page implements OnInit {
   loading = true;
   all: Transaction[] = [];
+  monthScoped: Transaction[] = [];
   filtered: Transaction[] = [];
   visible: Transaction[] = [];
 
@@ -21,14 +25,20 @@ export class Tab2Page implements OnInit {
   statusFilter: 'all' | 'Approved' | 'Declined' = 'all';
   typeFilter = 'all';
 
-  constructor(private dataSvc: DashboardDataService) {}
+  constructor(
+    private dataSvc: DashboardDataService,
+    private filterSvc: MonthFilterService
+  ) {}
 
   ngOnInit(): void {
-    this.dataSvc.getTransactions().subscribe((tx) => {
-      this.all = [...tx].sort((a, b) => (a.date + a.time < b.date + b.time ? 1 : -1));
-      this.applyFilters();
-      this.loading = false;
-    });
+    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
+      ([tx, month]) => {
+        this.all = [...tx].sort((a, b) => (a.date + a.time < b.date + b.time ? 1 : -1));
+        this.monthScoped = filterByMonth(this.all, month);
+        this.applyFilters();
+        this.loading = false;
+      }
+    );
   }
 
   onSearch(ev: CustomEvent): void {
@@ -48,7 +58,7 @@ export class Tab2Page implements OnInit {
 
   private applyFilters(): void {
     const term = this.searchTerm.trim().toLowerCase();
-    this.filtered = this.all.filter((t) => {
+    this.filtered = this.monthScoped.filter((t) => {
       if (this.statusFilter !== 'all' && t.status !== this.statusFilter) return false;
       if (this.typeFilter !== 'all' && t.type !== this.typeFilter) return false;
       if (term) {

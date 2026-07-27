@@ -1,6 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>لوحة المدفوعات</ion-title>
+    <app-month-select slot="end"></app-month-select>
   </ion-toolbar>
 </ion-header>
 
@@ -11,9 +12,9 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="page-wrap" *ngIf="!loading && data">
+  <div class="page-wrap" *ngIf="!loading && kpis">
     <p class="period-label">
-      الفترة: {{ data.kpis.dateFrom }} إلى {{ data.kpis.dateTo }} · Global Aviation
+      الفترة: {{ kpis.dateFrom }} إلى {{ kpis.dateTo }} · Global Aviation
     </p>
 
     <ion-grid class="kpi-grid">
@@ -21,7 +22,7 @@
         <ion-col size="12" size-sm="6" size-lg="3">
           <app-kpi-card
             label="إجمالي المعاملات"
-            [value]="data.kpis.totalTransactions | amountFormat"
+            [value]="kpis.totalTransactions | amountFormat"
             icon="swap-horizontal-outline"
             color="primary"
           ></app-kpi-card>
@@ -29,8 +30,8 @@
         <ion-col size="12" size-sm="6" size-lg="3">
           <app-kpi-card
             label="نسبة القبول"
-            [value]="data.kpis.approvalRate + '%'"
-            [sub]="(data.kpis.approvedCount | amountFormat) + ' مقبولة'"
+            [value]="kpis.approvalRate + '%'"
+            [sub]="(kpis.approvedCount | amountFormat) + ' مقبولة'"
             icon="checkmark-circle-outline"
             color="success"
           ></app-kpi-card>
@@ -38,7 +39,7 @@
         <ion-col size="12" size-sm="6" size-lg="3">
           <app-kpi-card
             label="معاملات مرفوضة"
-            [value]="data.kpis.declinedCount | amountFormat"
+            [value]="kpis.declinedCount | amountFormat"
             icon="close-circle-outline"
             color="danger"
           ></app-kpi-card>
@@ -46,8 +47,8 @@
         <ion-col size="12" size-sm="6" size-lg="3">
           <app-kpi-card
             label="إجمالي المبالغ المعتمدة"
-            [value]="compactAmount(data.kpis.approvedAmountByCcy['IQD'] || 0) + ' د.ع'"
-            [sub]="'+ ' + (data.kpis.approvedAmountByCcy['USD'] | amountFormat:0) + ' $'"
+            [value]="compactAmount(kpis.approvedAmountByCcy['IQD'] || 0) + ' د.ع'"
+            [sub]="'+ ' + (kpis.approvedAmountByCcy['USD'] | amountFormat:0) + ' $'"
             icon="cash-outline"
             color="tertiary"
           ></app-kpi-card>
@@ -142,12 +143,12 @@
             </ion-card-content>
           </ion-card>
 
-          <ion-card class="chart-card" *ngIf="data.errors.length">
+          <ion-card class="chart-card" *ngIf="errors.length">
             <ion-card-header>
               <ion-card-title>أبرز أسباب الرفض</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <div class="reason-row" *ngFor="let e of data.errors">
+              <div class="reason-row" *ngFor="let e of errors">
                 <div class="reason-top">
                   <span>{{ e.label }}</span>
                   <span class="reason-count">{{ e.count }}</span>
@@ -161,9 +162,19 @@
               </div>
             </ion-card-content>
           </ion-card>
+
+          <div class="empty-state" *ngIf="!errors.length && kpis.totalTransactions">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+            <p>لا توجد معاملات مرفوضة في هذه الفترة</p>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <div class="empty-state" *ngIf="!kpis.totalTransactions">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+      <p>لا توجد معاملات في الشهر المختار</p>
+    </div>
   </div>
 
   <div class="loading-wrap" *ngIf="loading">
