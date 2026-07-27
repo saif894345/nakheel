@@ -1,0 +1,43 @@
+<ion-card class="compare-card" *ngIf="data">
+  <ion-card-header>
+    <ion-card-title>{{ title }}</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <div class="compare-row">
+      <div class="compare-metric">
+        <span class="metric-label">عدد المعاملات</span>
+        <div class="metric-values">
+          <span class="metric-current">{{ data.count }}</span>
+          <span class="metric-prev">مقابل {{ data.prevCount }}</span>
+        </div>
+        <span
+          class="metric-change"
+          *ngIf="data.countChangePct !== null"
+          [class.up]="data.countChangePct >= 0"
+          [class.down]="data.countChangePct < 0"
+        >
+          <ion-icon [name]="data.countChangePct >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+          {{ (data.countChangePct >= 0 ? '+' : '') + data.countChangePct }}%
+        </span>
+      </div>
+
+      <div class="compare-metric">
+        <span class="metric-label">المبلغ (د.ع)</span>
+        <div class="metric-values">
+          <span class="metric-current">{{ compactAmount(data.amountIQD) }}</span>
+          <span class="metric-prev">مقابل {{ compactAmount(data.prevAmountIQD) }}</span>
+        </div>
+        <span
+          class="metric-change"
+          *ngIf="data.amountChangePct !== null"
+          [class.up]="data.amountChangePct >= 0"
+          [class.down]="data.amountChangePct < 0"
+        >
+          <ion-icon [name]="data.amountChangePct >= 0 ? 'arrow-up-outline' : 'arrow-down-outline'"></ion-icon>
+          {{ (data.amountChangePct >= 0 ? '+' : '') + data.amountChangePct }}%
+        </span>
+      </div>
+    </div>
+    <p class="compare-caption">{{ data.labelCurrent }} مقابل {{ data.labelPrevious }}</p>
+  </ion-card-content>
+</ion-card>

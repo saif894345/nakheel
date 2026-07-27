@@ -3,8 +3,9 @@ import { ChartConfiguration } from 'chart.js/auto';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
-import { DashboardKpis, Transaction } from '../models/dashboard.model';
+import { AgentStat, DashboardKpis, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
+import { PeriodCompareData } from '../shared/period-compare/period-compare.component';
 import {
   computeAgents,
   computeDaily,
@@ -12,7 +13,15 @@ import {
   computeKpis,
   computeVpos,
   filterByMonth,
+  getLatestDates,
+  monthLabel,
+  previousMonthKey,
 } from '../shared/utils/aggregate';
+
+function pctChange(curr: number, prev: number): number | null {
+  if (!prev) return null;
+  return Math.round(((curr - prev) / prev) * 1000) / 10;
+}
 
 const COLORS = {
   primary: '#3880ff',
@@ -34,6 +43,11 @@ export class Tab1Page implements OnInit {
   kpis?: DashboardKpis;
   errors: ReturnType<typeof computeErrors> = [];
   trendMode: 'daily' | 'weekly' = 'weekly';
+
+  topAgents: AgentStat[] = [];
+  bottomAgents: AgentStat[] = [];
+  dayCompare?: PeriodCompareData;
+  monthCompare?: PeriodCompareData;
 
   private filtered: Transaction[] = [];
   private dailyData: ReturnType<typeof computeDaily> = [];
@@ -65,9 +79,71 @@ export class Tab1Page implements OnInit {
         this.buildAgentsChart();
         this.buildVposChart();
         this.buildTrendChart();
+        this.buildTopBottomAgents();
+        this.buildDayCompare();
+        this.buildMonthCompare(tx, month);
         this.loading = false;
       }
     );
+  }
+
+  private buildTopBottomAgents(): void {
+    const agents = computeAgents(this.filtered).filter((a) => a.total >= 3);
+    const byAmount = [...agents].sort((a, b) => b.amountIQD - a.amountIQD);
+    this.topAgents = byAmount.slice(0, 5);
+    this.bottomAgents = byAmount.slice(-5).reverse();
+  }
+
+  private buildDayCompare(): void {
+    const [latest, previous] = getLatestDates(this.filtered, 2);
+    if (!latest || !previous) {
+      this.dayCompare = undefined;
+      return;
+    }
+    const curr = this.dailyData.find((d) => d.date === latest);
+    const prev = this.dailyData.find((d) => d.date === previous);
+    if (!curr || !prev) {
+      this.dayCompare = undefined;
+      return;
+    }
+    this.dayCompare = {
+      labelCurrent: latest,
+      labelPrevious: previous,
+      count: curr.total,
+      prevCount: prev.total,
+      amountIQD: curr.amountIQD,
+      prevAmountIQD: prev.amountIQD,
+      countChangePct: pctChange(curr.total, prev.total),
+      amountChangePct: pctChange(curr.amountIQD, prev.amountIQD),
+    };
+  }
+
+  private buildMonthCompare(allTx: Transaction[], month: string): void {
+    if (!month || month === 'all') {
+      this.monthCompare = undefined;
+      return;
+    }
+    const prevMonth = previousMonthKey(month);
+    const prevTx = filterByMonth(allTx, prevMonth);
+    if (!prevTx.length) {
+      this.monthCompare = undefined;
+      return;
+    }
+    const currKpis = computeKpis(this.filtered);
+    const prevKpis = computeKpis(prevTx);
+    this.monthCompare = {
+      labelCurrent: monthLabel(month),
+      labelPrevious: monthLabel(prevMonth),
+      count: currKpis.totalTransactions,
+      prevCount: prevKpis.totalTransactions,
+      amountIQD: currKpis.approvedAmountByCcy['IQD'] || 0,
+      prevAmountIQD: prevKpis.approvedAmountByCcy['IQD'] || 0,
+      countChangePct: pctChange(currKpis.totalTransactions, prevKpis.totalTransactions),
+      amountChangePct: pctChange(
+        currKpis.approvedAmountByCcy['IQD'] || 0,
+        prevKpis.approvedAmountByCcy['IQD'] || 0
+      ),
+    };
   }
 
   setTrendMode(mode: 'daily' | 'weekly'): void {

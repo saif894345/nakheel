@@ -5,6 +5,7 @@ import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
 import { Transaction } from '../models/dashboard.model';
 import { filterByMonth } from '../shared/utils/aggregate';
+import { downloadCsv } from '../shared/utils/csv-export';
 
 const PAGE_SIZE = 30;
 
@@ -79,5 +80,35 @@ export class Tab2Page implements OnInit {
   typeLabel(t: string): string {
     const map: Record<string, string> = { Auth: 'دفع', Void: 'إلغاء', Credit: 'استرجاع' };
     return map[t] || t;
+  }
+
+  exportCsv(): void {
+    const headers = [
+      'رقم الحجز',
+      'الوكيل',
+      'المستخدم',
+      'التاريخ',
+      'الوقت',
+      'المبلغ',
+      'العملة',
+      'النوع',
+      'الحالة',
+      'كود الخطأ',
+      'رسالة الخطأ',
+    ];
+    const rows = this.filtered.map((t) => [
+      t.pnr,
+      t.agent,
+      t.user,
+      t.date,
+      t.time,
+      t.amount,
+      t.currency,
+      this.typeLabel(t.type),
+      t.status === 'Approved' ? 'مقبولة' : 'مرفوضة',
+      t.errorCode,
+      t.errMessage,
+    ]);
+    downloadCsv(`transactions-${Date.now()}.csv`, headers, rows);
   }
 }

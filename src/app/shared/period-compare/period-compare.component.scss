@@ -1,0 +1,67 @@
+.compare-card {
+  margin: 0 0 12px;
+}
+
+.compare-row {
+  display: flex;
+  gap: 16px;
+}
+
+.compare-metric {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.metric-values {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  direction: ltr;
+  justify-content: flex-end;
+}
+
+.metric-current {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.metric-prev {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+}
+
+.metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+
+  ion-icon {
+    font-size: 13px;
+  }
+
+  &.up {
+    color: var(--ion-color-success);
+  }
+
+  &.down {
+    color: var(--ion-color-danger);
+  }
+}
+
+.compare-caption {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  direction: ltr;
+  text-align: right;
+}

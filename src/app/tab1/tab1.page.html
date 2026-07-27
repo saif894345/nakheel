@@ -17,6 +17,17 @@
       الفترة: {{ kpis.dateFrom }} إلى {{ kpis.dateTo }} · Global Aviation
     </p>
 
+    <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
+      <ion-row>
+        <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">
+          <app-period-compare title="مقارنة بآخر يوم بيانات سابق" [data]="dayCompare"></app-period-compare>
+        </ion-col>
+        <ion-col size="12" size-md="6" *ngIf="monthCompare">
+          <app-period-compare title="مقارنة بالشهر السابق" [data]="monthCompare"></app-period-compare>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
     <ion-grid class="kpi-grid">
       <ion-row>
         <ion-col size="12" size-sm="6" size-lg="3">
@@ -167,6 +178,40 @@
             <ion-icon name="checkmark-done-outline"></ion-icon>
             <p>لا توجد معاملات مرفوضة في هذه الفترة</p>
           </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-grid class="content-grid" *ngIf="topAgents.length">
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card class="chart-card">
+            <ion-card-header>
+              <ion-card-title>أعلى 5 وكلاء إيراداً</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="rank-row" *ngFor="let a of topAgents; let i = index">
+                <span class="rank-num success">{{ i + 1 }}</span>
+                <span class="rank-name">{{ a.agent }}</span>
+                <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card class="chart-card">
+            <ion-card-header>
+              <ion-card-title>أقل 5 وكلاء إيراداً</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="rank-row" *ngFor="let a of bottomAgents; let i = index">
+                <span class="rank-num danger">{{ i + 1 }}</span>
+                <span class="rank-name">{{ a.agent }}</span>
+                <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>

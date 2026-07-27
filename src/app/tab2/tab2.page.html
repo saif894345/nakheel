@@ -42,7 +42,11 @@
 
 <ion-content>
   <div class="result-count" *ngIf="!loading">
-    {{ filtered.length }} من أصل {{ monthScoped.length }} معاملة
+    <span>{{ filtered.length }} من أصل {{ monthScoped.length }} معاملة</span>
+    <ion-button size="small" fill="outline" (click)="exportCsv()" [disabled]="!filtered.length">
+      <ion-icon name="download-outline" slot="start"></ion-icon>
+      تصدير Excel
+    </ion-button>
   </div>
 
   <ion-list *ngIf="!loading" class="tx-list">

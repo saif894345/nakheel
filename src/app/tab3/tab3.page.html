@@ -26,7 +26,13 @@
 </ion-header>
 
 <ion-content>
-  <div class="result-count" *ngIf="!loading">{{ visible.length }} وكيل</div>
+  <div class="result-count" *ngIf="!loading">
+    <span>{{ visible.length }} وكيل</span>
+    <ion-button size="small" fill="outline" (click)="exportCsv()" [disabled]="!visible.length">
+      <ion-icon name="download-outline" slot="start"></ion-icon>
+      تصدير Excel
+    </ion-button>
+  </div>
 
   <div class="agents-grid" *ngIf="!loading">
     <ion-card class="agent-card" *ngFor="let a of visible">

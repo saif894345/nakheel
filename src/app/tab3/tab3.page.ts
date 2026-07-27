@@ -5,6 +5,7 @@ import { MonthFilterService } from '../services/month-filter.service';
 import { AgentStat, AgentUserStat, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { computeAgentUserStat, computeAgents, filterByMonth } from '../shared/utils/aggregate';
+import { downloadCsv } from '../shared/utils/csv-export';
 
 type SortKey = 'total' | 'amountIQD' | 'approvalRate';
 
@@ -79,5 +80,29 @@ export class Tab3Page implements OnInit {
     this.expandedAgent = agent;
     this.expandedUser = user;
     this.expandedStat = computeAgentUserStat(this.monthScopedTx, agent, user);
+  }
+
+  exportCsv(): void {
+    const headers = [
+      'الوكيل',
+      'إجمالي المعاملات',
+      'مقبولة',
+      'مرفوضة',
+      'نسبة القبول %',
+      'المبلغ (د.ع)',
+      'المبلغ ($)',
+      'المستخدمون',
+    ];
+    const rows = this.visible.map((a) => [
+      a.agent,
+      a.total,
+      a.approved,
+      a.declined,
+      a.approvalRate,
+      a.amountIQD,
+      a.amountUSD,
+      a.users.join(' | '),
+    ]);
+    downloadCsv(`agents-${Date.now()}.csv`, headers, rows);
   }
 }

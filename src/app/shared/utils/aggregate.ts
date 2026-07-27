@@ -36,6 +36,11 @@ export interface MonthOption {
   count: number;
 }
 
+export function monthLabel(monthKey: string): string {
+  const [y, m] = monthKey.split('-');
+  return `${ARABIC_MONTHS[parseInt(m, 10) - 1]} ${y}`;
+}
+
 export function getAvailableMonths(transactions: Transaction[]): MonthOption[] {
   const map = new Map<string, number>();
   for (const t of transactions) {
@@ -53,6 +58,19 @@ export function getAvailableMonths(transactions: Transaction[]): MonthOption[] {
 export function filterByMonth(transactions: Transaction[], month: string): Transaction[] {
   if (!month || month === 'all') return transactions;
   return transactions.filter((t) => t.date.slice(0, 7) === month);
+}
+
+/** Most recent distinct transaction dates present in the data, newest first. */
+export function getLatestDates(transactions: Transaction[], count = 2): string[] {
+  const dates = [...new Set(transactions.map((t) => t.date))].sort();
+  return dates.slice(-count).reverse();
+}
+
+/** "YYYY-MM" for the calendar month immediately before the given one. */
+export function previousMonthKey(monthKey: string): string {
+  const [y, m] = monthKey.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
 function sumByCcy(rows: Transaction[]): Record<string, number> {
