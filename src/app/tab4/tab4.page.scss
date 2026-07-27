@@ -120,25 +120,35 @@
 }
 
 .detail-row {
+  font-size: 12.5px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--app-border-color);
+}
+
+.detail-top,
+.detail-bottom {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 8px;
-  font-size: 12.5px;
-  padding: 5px 0;
-  border-bottom: 1px dashed var(--app-border-color);
+}
+
+.detail-top {
+  margin-bottom: 3px;
+}
+
+.detail-type-badge {
+  font-size: 10px;
 }
 
 .detail-pnr {
   direction: ltr;
   font-weight: 600;
-  flex: 0 0 auto;
 }
 
 .detail-date {
   color: var(--ion-color-medium);
   direction: ltr;
-  flex: 1;
-  text-align: center;
 }
 
 .detail-amount {

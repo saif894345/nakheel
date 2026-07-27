@@ -109,4 +109,9 @@ export class Tab4Page implements OnInit {
   maxCount(): number {
     return this.all.reduce((m, g) => Math.max(m, g.totalCount), 1);
   }
+
+  typeLabel(t: string): string {
+    const map: Record<string, string> = { Auth: 'شحن رصيد', Void: 'إلغاء شحن', Credit: 'استرجاع' };
+    return map[t] || t;
+  }
 }

@@ -94,11 +94,18 @@
 
         <div class="emp-detail" *ngIf="expandedEmployee === g.employee">
           <div class="detail-row" *ngFor="let t of opsFor(g.employee)">
-            <span class="detail-pnr">{{ t.pnr }}</span>
-            <span class="detail-date">{{ t.date }} · {{ t.time }}</span>
-            <span class="detail-amount" [class.negative]="t.amount < 0">
-              {{ t.amount | amountFormat }} {{ t.currency }}
-            </span>
+            <div class="detail-top">
+              <span class="detail-pnr">{{ t.pnr }}</span>
+              <ion-badge [color]="t.type === 'Void' ? 'danger' : 'success'" class="detail-type-badge">
+                {{ typeLabel(t.type) }}
+              </ion-badge>
+            </div>
+            <div class="detail-bottom">
+              <span class="detail-date">{{ t.date }} · {{ t.time }}</span>
+              <span class="detail-amount" [class.negative]="t.amount < 0">
+                {{ t.amount | amountFormat }} {{ t.currency }}
+              </span>
+            </div>
           </div>
         </div>
       </ion-card>
