@@ -111,6 +111,14 @@
   color: var(--ion-color-medium);
 }
 
+.net-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  direction: ltr;
+  text-align: right;
+}
+
 .emp-detail {
   margin-top: 12px;
   border-top: 1px solid var(--app-border-color);

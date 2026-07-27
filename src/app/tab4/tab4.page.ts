@@ -10,7 +10,8 @@ interface EmployeeGroup {
   employee: string;
   agents: CashTopup[];
   totalCount: number;
-  totalAmount: number;
+  totalGrossAmount: number;
+  totalNetAmount: number;
   firstDate: string;
   lastDate: string;
 }
@@ -28,7 +29,8 @@ export class Tab4Page implements OnInit {
   searchTerm = '';
 
   totalOps = 0;
-  totalAmount = 0;
+  totalGrossAmount = 0;
+  totalNetAmount = 0;
   totalEmployees = 0;
 
   private monthScopedTx: Transaction[] = [];
@@ -47,7 +49,8 @@ export class Tab4Page implements OnInit {
         const cashTopups = computeCashTopups(this.monthScopedTx);
         this.all = this.groupByEmployee(cashTopups);
         this.totalOps = cashTopups.reduce((s, c) => s + c.count, 0);
-        this.totalAmount = cashTopups.reduce((s, c) => s + c.netAmount, 0);
+        this.totalGrossAmount = cashTopups.reduce((s, c) => s + c.grossAmount, 0);
+        this.totalNetAmount = cashTopups.reduce((s, c) => s + c.netAmount, 0);
         this.totalEmployees = this.all.length;
         this.applyFilters();
         this.loading = false;
@@ -64,7 +67,8 @@ export class Tab4Page implements OnInit {
           employee: r.employee,
           agents: [],
           totalCount: 0,
-          totalAmount: 0,
+          totalGrossAmount: 0,
+          totalNetAmount: 0,
           firstDate: r.firstDate,
           lastDate: r.lastDate,
         };
@@ -72,7 +76,8 @@ export class Tab4Page implements OnInit {
       }
       g.agents.push(r);
       g.totalCount += r.count;
-      g.totalAmount += r.netAmount;
+      g.totalGrossAmount += r.grossAmount;
+      g.totalNetAmount += r.netAmount;
       if (r.firstDate < g.firstDate) g.firstDate = r.firstDate;
       if (r.lastDate > g.lastDate) g.lastDate = r.lastDate;
     }

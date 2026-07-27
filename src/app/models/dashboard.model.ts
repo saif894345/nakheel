@@ -71,6 +71,9 @@ export interface CashTopup {
   employee: string;
   agent: string;
   count: number;
+  /** Sum of actual charges (Auth) - the real amount used, unaffected by later cancellations. */
+  grossAmount: number;
+  /** Sum of all amounts including Void reversals - what's left after cancellations net out. */
   netAmount: number;
   firstDate: string;
   lastDate: string;

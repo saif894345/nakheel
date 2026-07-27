@@ -39,8 +39,9 @@
         </ion-col>
         <ion-col size="12" size-sm="4">
           <app-kpi-card
-            label="إجمالي مبالغ التعزيز"
-            [value]="compactAmount(totalAmount) + ' د.ع'"
+            label="إجمالي المبلغ المستخدم فعلياً"
+            [value]="compactAmount(totalGrossAmount) + ' د.ع'"
+            [sub]="'بعد خصم الإلغاءات: ' + compactAmount(totalNetAmount) + ' د.ع'"
             icon="wallet-outline"
             color="success"
           ></app-kpi-card>
@@ -65,7 +66,7 @@
 
         <div class="emp-agents">
           <ion-badge color="medium" *ngFor="let a of g.agents">
-            {{ a.agent }} · {{ a.count }}
+            {{ a.agent }} · {{ a.count }} عملية · {{ compactAmount(a.grossAmount) }} د.ع
           </ion-badge>
         </div>
 
@@ -79,8 +80,8 @@
             <span class="stat-label">عملية</span>
           </div>
           <div class="stat">
-            <span class="stat-value">{{ compactAmount(g.totalAmount) }}</span>
-            <span class="stat-label">د.ع</span>
+            <span class="stat-value">{{ compactAmount(g.totalGrossAmount) }}</span>
+            <span class="stat-label">المبلغ المستخدم (د.ع)</span>
           </div>
           <div class="stat">
             <span class="stat-value date">{{ g.firstDate }}</span>
@@ -91,6 +92,10 @@
             <span class="stat-label">آخر عملية</span>
           </div>
         </div>
+
+        <p class="net-hint" *ngIf="g.totalNetAmount !== g.totalGrossAmount">
+          بعد خصم الإلغاءات: {{ compactAmount(g.totalNetAmount) }} د.ع
+        </p>
 
         <div class="emp-detail" *ngIf="expandedEmployee === g.employee">
           <div class="detail-row" *ngFor="let t of opsFor(g.employee)">

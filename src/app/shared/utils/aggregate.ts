@@ -352,11 +352,20 @@ export function computeCashTopups(tx: Transaction[]): CashTopup[] {
     const key = t.user + '|' + t.agent;
     let c = map.get(key);
     if (!c) {
-      c = { employee: t.user, agent: t.agent, count: 0, netAmount: 0, firstDate: t.date, lastDate: t.date };
+      c = {
+        employee: t.user,
+        agent: t.agent,
+        count: 0,
+        grossAmount: 0,
+        netAmount: 0,
+        firstDate: t.date,
+        lastDate: t.date,
+      };
       map.set(key, c);
     }
     c.count++;
     c.netAmount += t.amount;
+    if (t.type === 'Auth') c.grossAmount += t.amount;
     if (t.date < c.firstDate) c.firstDate = t.date;
     if (t.date > c.lastDate) c.lastDate = t.date;
   }
