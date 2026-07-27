@@ -61,9 +61,30 @@ export class Tab3Page implements OnInit {
   private applyFilters(): void {
     let list = this.all;
     if (this.searchTerm) {
-      list = list.filter((a) => a.agent.toLowerCase().includes(this.searchTerm));
+      list = list.filter(
+        (a) =>
+          a.agent.toLowerCase().includes(this.searchTerm) ||
+          a.users.some((u) => u.toLowerCase().includes(this.searchTerm))
+      );
     }
     this.visible = [...list].sort((a, b) => b[this.sortKey] - a[this.sortKey]);
+
+    // If the search matched a specific user login, expand it immediately
+    // so the answer ("how much did X add") is visible without an extra click.
+    this.expandedAgent = null;
+    this.expandedUser = null;
+    this.expandedStat = undefined;
+    if (this.searchTerm) {
+      for (const a of this.visible) {
+        const matchedUser = a.users.find((u) => u.toLowerCase().includes(this.searchTerm));
+        if (matchedUser) {
+          this.expandedAgent = a.agent;
+          this.expandedUser = matchedUser;
+          this.expandedStat = computeAgentUserStat(this.monthScopedTx, a.agent, matchedUser);
+          break;
+        }
+      }
+    }
   }
 
   maxTotal(): number {
