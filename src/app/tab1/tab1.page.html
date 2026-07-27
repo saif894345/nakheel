@@ -20,7 +20,7 @@
     <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
       <ion-row>
         <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">
-          <app-period-compare title="مقارنة بآخر يوم بيانات سابق" [data]="dayCompare"></app-period-compare>
+          <app-period-compare title="مقارنة آخر يوم باليوم الذي قبله" [data]="dayCompare"></app-period-compare>
         </ion-col>
         <ion-col size="12" size-md="6" *ngIf="monthCompare">
           <app-period-compare title="مقارنة بالشهر السابق" [data]="monthCompare"></app-period-compare>
