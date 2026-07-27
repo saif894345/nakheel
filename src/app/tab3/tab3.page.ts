@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
-import { AgentStat } from '../models/dashboard.model';
+import { AgentStat, AgentUserStat, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
-import { computeAgents, filterByMonth } from '../shared/utils/aggregate';
+import { computeAgentUserStat, computeAgents, filterByMonth } from '../shared/utils/aggregate';
 
 type SortKey = 'total' | 'amountIQD' | 'approvalRate';
 
@@ -22,6 +22,12 @@ export class Tab3Page implements OnInit {
   sortKey: SortKey = 'total';
   compactAmount = compactAmount;
 
+  expandedAgent: string | null = null;
+  expandedUser: string | null = null;
+  expandedStat?: AgentUserStat;
+
+  private monthScopedTx: Transaction[] = [];
+
   constructor(
     private dataSvc: DashboardDataService,
     private filterSvc: MonthFilterService
@@ -30,8 +36,12 @@ export class Tab3Page implements OnInit {
   ngOnInit(): void {
     combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
       ([tx, month]) => {
-        this.all = computeAgents(filterByMonth(tx, month));
+        this.monthScopedTx = filterByMonth(tx, month);
+        this.all = computeAgents(this.monthScopedTx);
         this.applyFilters();
+        this.expandedAgent = null;
+        this.expandedUser = null;
+        this.expandedStat = undefined;
         this.loading = false;
       }
     );
@@ -57,5 +67,17 @@ export class Tab3Page implements OnInit {
 
   maxTotal(): number {
     return this.all.reduce((m, a) => Math.max(m, a.total), 1);
+  }
+
+  toggleUser(agent: string, user: string): void {
+    if (this.expandedAgent === agent && this.expandedUser === user) {
+      this.expandedAgent = null;
+      this.expandedUser = null;
+      this.expandedStat = undefined;
+      return;
+    }
+    this.expandedAgent = agent;
+    this.expandedUser = user;
+    this.expandedStat = computeAgentUserStat(this.monthScopedTx, agent, user);
   }
 }

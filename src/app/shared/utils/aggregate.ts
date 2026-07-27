@@ -1,5 +1,6 @@
 import {
   AgentStat,
+  AgentUserStat,
   BurstFlag,
   CashTopup,
   DailyPoint,
@@ -135,6 +136,31 @@ export function computeAgents(tx: Transaction[]): AgentStat[] {
     a.users = [...(userSets.get(a.agent) || [])].sort();
   }
   return list.sort((x, y) => y.total - x.total);
+}
+
+/** Breakdown of a single agent's transactions by the user (login) who entered them. */
+export function computeAgentUserStat(tx: Transaction[], agent: string, user: string): AgentUserStat {
+  const rows = tx.filter((t) => t.agent === agent && t.user === user);
+  const approved = rows.filter((t) => t.status === 'Approved');
+  const declined = rows.filter((t) => t.status === 'Declined');
+  let amountIQD = 0;
+  let amountUSD = 0;
+  for (const t of rows) {
+    if (t.type === 'Auth' && t.status === 'Approved') {
+      if (t.currency === 'IQD') amountIQD += t.amount;
+      if (t.currency === 'USD') amountUSD += t.amount;
+    }
+  }
+  return {
+    agent,
+    user,
+    total: rows.length,
+    approved: approved.length,
+    declined: declined.length,
+    approvalRate: rows.length ? round((approved.length / rows.length) * 100, 1) : 0,
+    amountIQD,
+    amountUSD,
+  };
 }
 
 export function computeVpos(tx: Transaction[]): VposStat[] {

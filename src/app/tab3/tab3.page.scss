@@ -95,6 +95,60 @@
   margin-inline-end: 4px;
 }
 
+.user-badge {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &.active {
+    --background: var(--ion-color-primary);
+    --color: #fff;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.user-detail {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(56, 128, 255, 0.06);
+  border: 1px solid rgba(56, 128, 255, 0.15);
+}
+
+.user-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  direction: ltr;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.user-detail-stats {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.user-detail-amount {
+  display: flex;
+  justify-content: space-between;
+  direction: ltr;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ion-color-primary);
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

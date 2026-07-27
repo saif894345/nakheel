@@ -62,8 +62,45 @@
 
       <div class="agent-users" *ngIf="a.users.length">
         <ion-icon name="person-outline"></ion-icon>
-        <span class="users-label">أضاف المبلغ:</span>
-        <ion-badge color="medium" *ngFor="let u of a.users">{{ u }}</ion-badge>
+        <span class="users-label">أضاف المبلغ (اضغط للتفاصيل):</span>
+        <ion-badge
+          color="medium"
+          class="user-badge"
+          *ngFor="let u of a.users"
+          [class.active]="expandedAgent === a.agent && expandedUser === u"
+          (click)="toggleUser(a.agent, u)"
+        >
+          {{ u }}
+        </ion-badge>
+      </div>
+
+      <div class="user-detail" *ngIf="expandedAgent === a.agent && expandedStat">
+        <div class="user-detail-title">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          {{ expandedStat.user }}
+        </div>
+        <div class="user-detail-stats">
+          <div class="stat">
+            <span class="stat-value">{{ expandedStat.total }}</span>
+            <span class="stat-label">معاملة</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value success">{{ expandedStat.approved }}</span>
+            <span class="stat-label">مقبولة</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value danger">{{ expandedStat.declined }}</span>
+            <span class="stat-label">مرفوضة</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ expandedStat.approvalRate }}%</span>
+            <span class="stat-label">نسبة القبول</span>
+          </div>
+        </div>
+        <div class="user-detail-amount">
+          <span>{{ compactAmount(expandedStat.amountIQD) }} د.ع</span>
+          <span *ngIf="expandedStat.amountUSD">+ {{ expandedStat.amountUSD | amountFormat }} $</span>
+        </div>
       </div>
     </ion-card>
 

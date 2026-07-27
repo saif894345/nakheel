@@ -36,6 +36,17 @@ export interface AgentStat {
   users: string[];
 }
 
+export interface AgentUserStat {
+  agent: string;
+  user: string;
+  total: number;
+  approved: number;
+  declined: number;
+  approvalRate: number;
+  amountIQD: number;
+  amountUSD: number;
+}
+
 export interface VposStat {
   vpos: string;
   total: number;
