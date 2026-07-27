@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
-import { AgentStat, AgentUserStat, Transaction } from '../models/dashboard.model';
+import { AgentStat, AgentUserStat, DailyPoint, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
-import { computeAgentUserStat, computeAgents, filterByMonth } from '../shared/utils/aggregate';
+import { computeAgentUserStat, computeAgents, computeDaily, filterByMonth } from '../shared/utils/aggregate';
 import { downloadCsv } from '../shared/utils/csv-export';
 
 type SortKey = 'total' | 'amountIQD' | 'approvalRate';
@@ -26,6 +26,10 @@ export class Tab3Page implements OnInit {
   expandedAgent: string | null = null;
   expandedUser: string | null = null;
   expandedStat?: AgentUserStat;
+  userDaily: DailyPoint[] = [];
+
+  expandedAgentDaily: string | null = null;
+  agentDaily: DailyPoint[] = [];
 
   private monthScopedTx: Transaction[] = [];
 
@@ -43,6 +47,9 @@ export class Tab3Page implements OnInit {
         this.expandedAgent = null;
         this.expandedUser = null;
         this.expandedStat = undefined;
+        this.userDaily = [];
+        this.expandedAgentDaily = null;
+        this.agentDaily = [];
         this.loading = false;
       }
     );
@@ -74,6 +81,9 @@ export class Tab3Page implements OnInit {
     this.expandedAgent = null;
     this.expandedUser = null;
     this.expandedStat = undefined;
+    this.userDaily = [];
+    this.expandedAgentDaily = null;
+    this.agentDaily = [];
     if (this.searchTerm) {
       for (const a of this.visible) {
         const matchedUser = a.users.find((u) => u.toLowerCase().includes(this.searchTerm));
@@ -81,6 +91,7 @@ export class Tab3Page implements OnInit {
           this.expandedAgent = a.agent;
           this.expandedUser = matchedUser;
           this.expandedStat = computeAgentUserStat(this.monthScopedTx, a.agent, matchedUser);
+          this.userDaily = this.dailyFor(a.agent, matchedUser);
           break;
         }
       }
@@ -96,11 +107,31 @@ export class Tab3Page implements OnInit {
       this.expandedAgent = null;
       this.expandedUser = null;
       this.expandedStat = undefined;
+      this.userDaily = [];
       return;
     }
     this.expandedAgent = agent;
     this.expandedUser = user;
     this.expandedStat = computeAgentUserStat(this.monthScopedTx, agent, user);
+    this.userDaily = this.dailyFor(agent, user);
+  }
+
+  toggleAgentDaily(agent: string): void {
+    if (this.expandedAgentDaily === agent) {
+      this.expandedAgentDaily = null;
+      this.agentDaily = [];
+      return;
+    }
+    this.expandedAgentDaily = agent;
+    this.agentDaily = this.dailyFor(agent);
+  }
+
+  /** Last 14 active days, newest first, for the given agent (and optionally one of its users). */
+  private dailyFor(agent: string, user?: string): DailyPoint[] {
+    const rows = this.monthScopedTx.filter(
+      (t) => t.agent === agent && (!user || t.user === user)
+    );
+    return computeDaily(rows).slice(-14).reverse();
   }
 
   exportCsv(): void {

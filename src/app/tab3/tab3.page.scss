@@ -39,6 +39,22 @@
 .agent-name {
   font-weight: 700;
   font-size: 15px;
+
+  &.clickable {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    ion-icon {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+    }
+
+    &:active {
+      opacity: 0.7;
+    }
+  }
 }
 
 .agent-bar-bg {
@@ -119,6 +135,67 @@
   &:active {
     transform: scale(0.95);
   }
+}
+
+.daily-breakdown {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--app-border-color);
+  max-height: 220px;
+  overflow-y: auto;
+
+  &.user-daily {
+    background: rgba(56, 128, 255, 0.04);
+    border-color: rgba(56, 128, 255, 0.15);
+  }
+}
+
+.daily-breakdown-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.daily-row {
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 0.8fr 1.1fr;
+  gap: 4px;
+  font-size: 12px;
+  padding: 4px 0;
+  text-align: center;
+  direction: ltr;
+
+  &:not(:last-child) {
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+  }
+
+  .success {
+    color: var(--ion-color-success);
+  }
+}
+
+.daily-header {
+  font-weight: 700;
+  color: var(--ion-color-medium);
+  font-size: 11px;
+  border-bottom: 1px solid var(--app-border-color);
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  text-align: center;
+  margin: 6px 0 0;
 }
 
 .user-detail {

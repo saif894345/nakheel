@@ -37,7 +37,10 @@
   <div class="agents-grid" *ngIf="!loading">
     <ion-card class="agent-card" *ngFor="let a of visible">
       <div class="agent-top">
-        <div class="agent-name">{{ a.agent }}</div>
+        <div class="agent-name clickable" (click)="toggleAgentDaily(a.agent)">
+          {{ a.agent }}
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
         <ion-badge [color]="a.approvalRate >= 90 ? 'success' : a.approvalRate >= 70 ? 'warning' : 'danger'">
           {{ a.approvalRate }}%
         </ion-badge>
@@ -64,6 +67,26 @@
           <span class="stat-value">{{ compactAmount(a.amountIQD) }}</span>
           <span class="stat-label">د.ع</span>
         </div>
+      </div>
+
+      <div class="daily-breakdown" *ngIf="expandedAgentDaily === a.agent">
+        <div class="daily-breakdown-title">
+          <ion-icon name="calendar-outline"></ion-icon>
+          آخر أيام النشاط (الوكيل بالكامل)
+        </div>
+        <div class="daily-row daily-header">
+          <span>التاريخ</span>
+          <span>معاملات</span>
+          <span>مقبولة</span>
+          <span>المبلغ (د.ع)</span>
+        </div>
+        <div class="daily-row" *ngFor="let d of agentDaily">
+          <span>{{ d.date }}</span>
+          <span>{{ d.total }}</span>
+          <span class="success">{{ d.approved }}</span>
+          <span>{{ compactAmount(d.amountIQD) }}</span>
+        </div>
+        <p class="empty-hint" *ngIf="!agentDaily.length">لا توجد بيانات كافية لهذه الفترة</p>
       </div>
 
       <div class="agent-users" *ngIf="a.users.length">
@@ -106,6 +129,26 @@
         <div class="user-detail-amount">
           <span>{{ compactAmount(expandedStat.amountIQD) }} د.ع</span>
           <span *ngIf="expandedStat.amountUSD">+ {{ expandedStat.amountUSD | amountFormat }} $</span>
+        </div>
+
+        <div class="daily-breakdown user-daily">
+          <div class="daily-breakdown-title">
+            <ion-icon name="calendar-outline"></ion-icon>
+            آخر أيام نشاط هذا المستخدم
+          </div>
+          <div class="daily-row daily-header">
+            <span>التاريخ</span>
+            <span>معاملات</span>
+            <span>مقبولة</span>
+            <span>المبلغ (د.ع)</span>
+          </div>
+          <div class="daily-row" *ngFor="let d of userDaily">
+            <span>{{ d.date }}</span>
+            <span>{{ d.total }}</span>
+            <span class="success">{{ d.approved }}</span>
+            <span>{{ compactAmount(d.amountIQD) }}</span>
+          </div>
+          <p class="empty-hint" *ngIf="!userDaily.length">لا توجد بيانات كافية لهذه الفترة</p>
         </div>
       </div>
     </ion-card>
