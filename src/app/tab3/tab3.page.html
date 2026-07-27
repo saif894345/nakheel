@@ -59,6 +59,12 @@
           <span class="stat-label">د.ع</span>
         </div>
       </div>
+
+      <div class="agent-users" *ngIf="a.users.length">
+        <ion-icon name="person-outline"></ion-icon>
+        <span class="users-label">أضاف المبلغ:</span>
+        <ion-badge color="medium" *ngFor="let u of a.users">{{ u }}</ion-badge>
+      </div>
     </ion-card>
 
     <div class="empty-state" *ngIf="!visible.length">

@@ -1,0 +1,139 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>أمور مشكوك بها</ion-title>
+    <app-month-select slot="end"></app-month-select>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="ابحث باسم الوكيل أو المستخدم"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-wrap" *ngIf="!loading">
+    <p class="hint-banner">
+      هذه أنماط تلقائية تستحق المراجعة، وليست بالضرورة عمليات احتيال مؤكدة.
+    </p>
+
+    <ion-grid class="kpi-grid">
+      <ion-row>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="إلغاء ثم إعادة دفع بنفس المبلغ"
+            [value]="allReissues.length | amountFormat"
+            icon="refresh-outline"
+            color="warning"
+          ></app-kpi-card>
+        </ion-col>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="نشاط سريع غير اعتيادي"
+            [value]="allBursts.length | amountFormat"
+            icon="flash-outline"
+            color="tertiary"
+          ></app-kpi-card>
+        </ion-col>
+        <ion-col size="12" size-sm="4">
+          <app-kpi-card
+            label="مبالغ شاذة عن المتوسط"
+            [value]="allLarge.length | amountFormat"
+            icon="trending-up-outline"
+            color="danger"
+          ></app-kpi-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-segment [value]="category" (ionChange)="setCategory($any($event.detail.value))" class="cat-segment">
+      <ion-segment-button value="reissue">
+        <ion-label>إلغاء وإعادة دفع</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="burst">
+        <ion-label>نشاط سريع</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="large">
+        <ion-label>مبالغ شاذة</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Void + reauth same amount -->
+    <div class="list-wrap" *ngIf="category === 'reissue'">
+      <div class="result-count">{{ visibleReissues.length }} حالة</div>
+      <ion-card class="flag-card" *ngFor="let r of visibleReissues">
+        <div class="flag-top">
+          <span class="flag-pnr">{{ r.pnr }}</span>
+          <ion-badge color="warning">{{ r.amount | amountFormat }} {{ r.currency }}</ion-badge>
+        </div>
+        <div class="flag-mid">
+          <span>{{ r.agent }}</span>
+          <span class="flag-user">{{ r.user }}</span>
+        </div>
+        <div class="flag-bottom">
+          <span>إلغاء: {{ r.voidTime }}</span>
+          <span>إعادة دفع: {{ r.authTime }}</span>
+        </div>
+        <div class="flag-gap" *ngIf="r.gapSeconds > 0">
+          الفارق الزمني: {{ r.gapSeconds }} ثانية
+        </div>
+      </ion-card>
+      <div class="empty-state" *ngIf="!visibleReissues.length">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <p>لا توجد حالات إلغاء وإعادة دفع مطابقة</p>
+      </div>
+    </div>
+
+    <!-- Rapid bursts -->
+    <div class="list-wrap" *ngIf="category === 'burst'">
+      <div class="result-count">{{ visibleBursts.length }} حالة</div>
+      <ion-card class="flag-card" *ngFor="let b of visibleBursts">
+        <div class="flag-top">
+          <span class="flag-pnr">{{ b.agent }}</span>
+          <ion-badge color="tertiary">{{ b.count }} معاملات</ion-badge>
+        </div>
+        <div class="flag-mid">
+          <span class="flag-user">{{ b.user }}</span>
+          <span>{{ b.date }}</span>
+        </div>
+        <div class="flag-bottom">
+          <span>من {{ b.startTime }} إلى {{ b.endTime }}</span>
+        </div>
+      </ion-card>
+      <div class="empty-state" *ngIf="!visibleBursts.length">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <p>لا توجد حالات نشاط سريع مطابقة</p>
+      </div>
+    </div>
+
+    <!-- Large amount outliers -->
+    <div class="list-wrap" *ngIf="category === 'large'">
+      <div class="result-count">{{ visibleLarge.length }} حالة</div>
+      <ion-card class="flag-card" *ngFor="let l of visibleLarge">
+        <div class="flag-top">
+          <span class="flag-pnr">{{ l.pnr }}</span>
+          <ion-badge color="danger">{{ l.amount | amountFormat }} {{ l.currency }}</ion-badge>
+        </div>
+        <div class="flag-mid">
+          <span>{{ l.agent }}</span>
+          <span class="flag-user">{{ l.user }}</span>
+        </div>
+        <div class="flag-bottom">
+          <span>متوسط الوكيل: {{ compactAmount(l.agentAverage) }} د.ع</span>
+          <span>×{{ l.multiple }}</span>
+        </div>
+        <div class="flag-gap">{{ l.date }} · {{ l.time }}</div>
+      </ion-card>
+      <div class="empty-state" *ngIf="!visibleLarge.length">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <p>لا توجد مبالغ شاذة مطابقة</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>جارِ تحليل البيانات...</p>
+  </div>
+</ion-content>

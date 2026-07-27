@@ -1,9 +1,12 @@
 import {
   AgentStat,
+  BurstFlag,
   CashTopup,
   DailyPoint,
   DashboardKpis,
   ErrorStat,
+  LargeAmountFlag,
+  ReissueFlag,
   Transaction,
   TypeStat,
   VposStat,
@@ -109,11 +112,13 @@ export function computeDaily(tx: Transaction[]): DailyPoint[] {
 
 export function computeAgents(tx: Transaction[]): AgentStat[] {
   const map = new Map<string, AgentStat>();
+  const userSets = new Map<string, Set<string>>();
   for (const t of tx) {
     let a = map.get(t.agent);
     if (!a) {
-      a = { agent: t.agent, total: 0, approved: 0, declined: 0, approvalRate: 0, amountIQD: 0, amountUSD: 0 };
+      a = { agent: t.agent, total: 0, approved: 0, declined: 0, approvalRate: 0, amountIQD: 0, amountUSD: 0, users: [] };
       map.set(t.agent, a);
+      userSets.set(t.agent, new Set());
     }
     a.total++;
     if (t.status === 'Approved') a.approved++;
@@ -122,9 +127,13 @@ export function computeAgents(tx: Transaction[]): AgentStat[] {
       if (t.currency === 'IQD') a.amountIQD += t.amount;
       if (t.currency === 'USD') a.amountUSD += t.amount;
     }
+    if (t.user) userSets.get(t.agent)!.add(t.user);
   }
   const list = [...map.values()];
-  for (const a of list) a.approvalRate = a.total ? round((a.approved / a.total) * 100, 1) : 0;
+  for (const a of list) {
+    a.approvalRate = a.total ? round((a.approved / a.total) * 100, 1) : 0;
+    a.users = [...(userSets.get(a.agent) || [])].sort();
+  }
   return list.sort((x, y) => y.total - x.total);
 }
 
@@ -172,6 +181,124 @@ export function computeErrors(tx: Transaction[]): ErrorStat[] {
     e.count++;
   }
   return [...map.values()].sort((a, b) => b.count - a.count);
+}
+
+function toTimestamp(t: Transaction): number {
+  return new Date(`${t.date}T${t.time || '00:00:00'}`).getTime();
+}
+
+/** Void immediately followed (or preceded) by an Auth of the same amount for the same PNR -
+ * looks like a cancel-and-reissue used to manipulate balance rather than a real refund. */
+export function computeReissues(tx: Transaction[]): ReissueFlag[] {
+  const byPnr = new Map<string, Transaction[]>();
+  for (const t of tx) {
+    if (!byPnr.has(t.pnr)) byPnr.set(t.pnr, []);
+    byPnr.get(t.pnr)!.push(t);
+  }
+  const results: ReissueFlag[] = [];
+  for (const rows of byPnr.values()) {
+    const voids = rows.filter((r) => r.type === 'Void');
+    const auths = rows.filter((r) => r.type === 'Auth' && r.status === 'Approved');
+    const usedAuths = new Set<number>();
+    for (const v of voids) {
+      const idx = auths.findIndex(
+        (a, i) => !usedAuths.has(i) && a.currency === v.currency && Math.abs(a.amount - Math.abs(v.amount)) < 1
+      );
+      if (idx >= 0) {
+        usedAuths.add(idx);
+        const match = auths[idx];
+        results.push({
+          pnr: v.pnr,
+          agent: v.agent,
+          user: v.user,
+          amount: Math.abs(v.amount),
+          currency: v.currency,
+          voidTime: `${v.date} ${v.time}`,
+          authTime: `${match.date} ${match.time}`,
+          gapSeconds: Math.round(Math.abs(toTimestamp(match) - toTimestamp(v)) / 1000),
+        });
+      }
+    }
+  }
+  return results.sort((a, b) => a.gapSeconds - b.gapSeconds);
+}
+
+/** 3+ transactions from the same agent within a short rolling window - unusual velocity. */
+export function computeBursts(
+  tx: Transaction[],
+  windowSeconds = 120,
+  minCount = 3
+): BurstFlag[] {
+  const byAgent = new Map<string, Transaction[]>();
+  for (const t of tx) {
+    if (!byAgent.has(t.agent)) byAgent.set(t.agent, []);
+    byAgent.get(t.agent)!.push(t);
+  }
+  const results: BurstFlag[] = [];
+  for (const [agent, rows] of byAgent) {
+    const sorted = [...rows].sort((a, b) => toTimestamp(a) - toTimestamp(b));
+    let i = 0;
+    while (i < sorted.length) {
+      let j = i;
+      while (
+        j + 1 < sorted.length &&
+        toTimestamp(sorted[j + 1]) - toTimestamp(sorted[i]) <= windowSeconds * 1000
+      ) {
+        j++;
+      }
+      const count = j - i + 1;
+      if (count >= minCount) {
+        results.push({
+          agent,
+          user: sorted[i].user,
+          date: sorted[i].date,
+          startTime: sorted[i].time,
+          endTime: sorted[j].time,
+          count,
+        });
+        i = j + 1;
+      } else {
+        i++;
+      }
+    }
+  }
+  return results.sort((a, b) => b.count - a.count);
+}
+
+/** Transaction amount far above its agent's own average - possible outlier / abuse. */
+export function computeLargeAmountOutliers(
+  tx: Transaction[],
+  multiplierThreshold = 5,
+  minAbsoluteIQD = 3_000_000
+): LargeAmountFlag[] {
+  const approvedAuth = tx.filter((t) => t.type === 'Auth' && t.status === 'Approved' && t.currency === 'IQD');
+  const byAgent = new Map<string, Transaction[]>();
+  for (const t of approvedAuth) {
+    if (!byAgent.has(t.agent)) byAgent.set(t.agent, []);
+    byAgent.get(t.agent)!.push(t);
+  }
+  const results: LargeAmountFlag[] = [];
+  for (const [agent, rows] of byAgent) {
+    if (rows.length < 3) continue;
+    const avg = rows.reduce((s, r) => s + r.amount, 0) / rows.length;
+    if (avg <= 0) continue;
+    for (const r of rows) {
+      if (r.amount >= avg * multiplierThreshold && r.amount >= minAbsoluteIQD) {
+        results.push({
+          pnr: r.pnr,
+          agent,
+          user: r.user,
+          amount: r.amount,
+          currency: r.currency,
+          agentAverage: Math.round(avg),
+          multiple: round(r.amount / avg, 1),
+          date: r.date,
+          time: r.time,
+        });
+      }
+    }
+  }
+  return results.sort((a, b) => b.multiple - a.multiple);
 }
 
 export function computeCashTopups(tx: Transaction[]): CashTopup[] {

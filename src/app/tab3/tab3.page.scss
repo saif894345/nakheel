@@ -74,6 +74,27 @@
   color: var(--ion-color-medium);
 }
 
+.agent-users {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--app-border-color);
+  font-size: 11px;
+
+  ion-icon {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+  }
+}
+
+.users-label {
+  color: var(--ion-color-medium);
+  margin-inline-end: 4px;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

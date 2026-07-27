@@ -33,6 +33,7 @@ export interface AgentStat {
   approvalRate: number;
   amountIQD: number;
   amountUSD: number;
+  users: string[];
 }
 
 export interface VposStat {
@@ -62,6 +63,38 @@ export interface CashTopup {
   netAmount: number;
   firstDate: string;
   lastDate: string;
+}
+
+export interface ReissueFlag {
+  pnr: string;
+  agent: string;
+  user: string;
+  amount: number;
+  currency: string;
+  voidTime: string;
+  authTime: string;
+  gapSeconds: number;
+}
+
+export interface BurstFlag {
+  agent: string;
+  user: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  count: number;
+}
+
+export interface LargeAmountFlag {
+  pnr: string;
+  agent: string;
+  user: string;
+  amount: number;
+  currency: string;
+  agentAverage: number;
+  multiple: number;
+  date: string;
+  time: string;
 }
 
 export interface Transaction {
