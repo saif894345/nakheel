@@ -5,6 +5,7 @@ import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
 import { Transaction } from '../models/dashboard.model';
 import { filterByMonth } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 import { downloadCsv } from '../shared/utils/csv-export';
 
 const PAGE_SIZE = 30;
@@ -63,7 +64,7 @@ export class Tab2Page implements OnInit {
       if (this.statusFilter !== 'all' && t.status !== this.statusFilter) return false;
       if (this.typeFilter !== 'all' && t.type !== this.typeFilter) return false;
       if (term) {
-        const hay = `${t.pnr} ${t.agent} ${t.user}`.toLowerCase();
+        const hay = `${t.pnr} ${t.agent} ${agentNameAr(t.agent)} ${t.user}`.toLowerCase();
         if (!hay.includes(term)) return false;
       }
       return true;
@@ -98,7 +99,7 @@ export class Tab2Page implements OnInit {
     ];
     const rows = this.filtered.map((t) => [
       t.pnr,
-      t.agent,
+      agentNameAr(t.agent),
       t.user,
       t.date,
       t.time,

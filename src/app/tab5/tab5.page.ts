@@ -10,6 +10,7 @@ import {
   computeReissues,
   filterByMonth,
 } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 
 type Category = 'reissue' | 'burst' | 'large';
 
@@ -67,17 +68,26 @@ export class Tab5Page implements OnInit {
     this.visibleReissues = !term
       ? this.allReissues
       : this.allReissues.filter(
-          (r) => r.agent.toLowerCase().includes(term) || r.user.toLowerCase().includes(term)
+          (r) =>
+            r.agent.toLowerCase().includes(term) ||
+            agentNameAr(r.agent).includes(term) ||
+            r.user.toLowerCase().includes(term)
         );
     this.visibleBursts = !term
       ? this.allBursts
       : this.allBursts.filter(
-          (b) => b.agent.toLowerCase().includes(term) || b.user.toLowerCase().includes(term)
+          (b) =>
+            b.agent.toLowerCase().includes(term) ||
+            agentNameAr(b.agent).includes(term) ||
+            b.user.toLowerCase().includes(term)
         );
     this.visibleLarge = !term
       ? this.allLarge
       : this.allLarge.filter(
-          (l) => l.agent.toLowerCase().includes(term) || l.user.toLowerCase().includes(term)
+          (l) =>
+            l.agent.toLowerCase().includes(term) ||
+            agentNameAr(l.agent).includes(term) ||
+            l.user.toLowerCase().includes(term)
         );
   }
 }

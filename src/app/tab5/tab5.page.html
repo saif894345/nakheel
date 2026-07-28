@@ -68,7 +68,7 @@
           <ion-badge color="warning">{{ r.amount | amountFormat }} {{ r.currency }}</ion-badge>
         </div>
         <div class="flag-mid">
-          <span>{{ r.agent }}</span>
+          <span>{{ r.agent | agentName }}</span>
           <span class="flag-user">{{ r.user }}</span>
         </div>
         <div class="flag-bottom">
@@ -90,7 +90,7 @@
       <div class="result-count">{{ visibleBursts.length }} حالة</div>
       <ion-card class="flag-card" *ngFor="let b of visibleBursts">
         <div class="flag-top">
-          <span class="flag-pnr">{{ b.agent }}</span>
+          <span class="flag-pnr">{{ b.agent | agentName }}</span>
           <ion-badge color="tertiary">{{ b.count }} معاملات</ion-badge>
         </div>
         <div class="flag-mid">
@@ -116,7 +116,7 @@
           <ion-badge color="danger">{{ l.amount | amountFormat }} {{ l.currency }}</ion-badge>
         </div>
         <div class="flag-mid">
-          <span>{{ l.agent }}</span>
+          <span>{{ l.agent | agentName }}</span>
           <span class="flag-user">{{ l.user }}</span>
         </div>
         <div class="flag-bottom">

@@ -38,7 +38,7 @@
     <ion-card class="agent-card" *ngFor="let a of visible">
       <div class="agent-top">
         <div class="agent-name clickable" (click)="toggleAgentDaily(a.agent)">
-          {{ a.agent }}
+          {{ a.agent | agentName }}
           <ion-icon name="calendar-outline"></ion-icon>
         </div>
         <ion-badge [color]="a.approvalRate >= 90 ? 'success' : a.approvalRate >= 70 ? 'warning' : 'danger'">

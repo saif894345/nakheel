@@ -192,7 +192,7 @@
             <ion-card-content>
               <div class="rank-row" *ngFor="let a of topAgents; let i = index">
                 <span class="rank-num success">{{ i + 1 }}</span>
-                <span class="rank-name">{{ a.agent }}</span>
+                <span class="rank-name">{{ a.agent | agentName }}</span>
                 <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>
               </div>
             </ion-card-content>
@@ -207,7 +207,7 @@
             <ion-card-content>
               <div class="rank-row" *ngFor="let a of bottomAgents; let i = index">
                 <span class="rank-num danger">{{ i + 1 }}</span>
-                <span class="rank-name">{{ a.agent }}</span>
+                <span class="rank-name">{{ a.agent | agentName }}</span>
                 <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>
               </div>
             </ion-card-content>

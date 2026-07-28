@@ -5,6 +5,7 @@ import { MonthFilterService } from '../services/month-filter.service';
 import { AgentStat, AgentUserStat, DailyPoint, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { computeAgentUserStat, computeAgents, computeDaily, filterByMonth } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 import { downloadCsv } from '../shared/utils/csv-export';
 
 type SortKey = 'total' | 'amountIQD' | 'approvalRate';
@@ -71,6 +72,7 @@ export class Tab3Page implements OnInit {
       list = list.filter(
         (a) =>
           a.agent.toLowerCase().includes(this.searchTerm) ||
+          agentNameAr(a.agent).includes(this.searchTerm) ||
           a.users.some((u) => u.toLowerCase().includes(this.searchTerm))
       );
     }
@@ -146,7 +148,7 @@ export class Tab3Page implements OnInit {
       'المستخدمون',
     ];
     const rows = this.visible.map((a) => [
-      a.agent,
+      agentNameAr(a.agent),
       a.total,
       a.approved,
       a.declined,

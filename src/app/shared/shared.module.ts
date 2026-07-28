@@ -8,6 +8,7 @@ import { ChartCanvasComponent } from './chart-canvas/chart-canvas.component';
 import { MonthSelectComponent } from './month-select/month-select.component';
 import { PeriodCompareComponent } from './period-compare/period-compare.component';
 import { AmountFormatPipe } from './pipes/amount-format.pipe';
+import { AgentNamePipe } from './pipes/agent-name.pipe';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { AmountFormatPipe } from './pipes/amount-format.pipe';
     MonthSelectComponent,
     PeriodCompareComponent,
     AmountFormatPipe,
+    AgentNamePipe,
   ],
   imports: [CommonModule, FormsModule, IonicModule],
   exports: [
@@ -27,6 +29,7 @@ import { AmountFormatPipe } from './pipes/amount-format.pipe';
     MonthSelectComponent,
     PeriodCompareComponent,
     AmountFormatPipe,
+    AgentNamePipe,
   ],
 })
 export class SharedModule {}

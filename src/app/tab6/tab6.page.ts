@@ -4,6 +4,7 @@ import { DashboardDataService } from '../services/dashboard-data.service';
 import { Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { getLatestDates } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 
 const PAGE_SIZE = 25;
 
@@ -100,7 +101,7 @@ export class Tab6Page implements OnInit {
     this.filtered = this.dayTx.filter((t) => {
       if (this.statusFilter !== 'all' && t.status !== this.statusFilter) return false;
       if (term) {
-        const hay = `${t.pnr} ${t.agent} ${t.user}`.toLowerCase();
+        const hay = `${t.pnr} ${t.agent} ${agentNameAr(t.agent)} ${t.user}`.toLowerCase();
         if (!hay.includes(term)) return false;
       }
       return true;

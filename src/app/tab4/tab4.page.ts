@@ -5,6 +5,7 @@ import { MonthFilterService } from '../services/month-filter.service';
 import { CashTopup, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { computeCashTopups, filterByMonth } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 
 interface EmployeeGroup {
   employee: string;
@@ -97,7 +98,11 @@ export class Tab4Page implements OnInit {
     this.visible = this.all.filter(
       (g) =>
         g.employee.toLowerCase().includes(this.searchTerm) ||
-        g.agents.some((a) => a.agent.toLowerCase().includes(this.searchTerm))
+        g.agents.some(
+          (a) =>
+            a.agent.toLowerCase().includes(this.searchTerm) ||
+            agentNameAr(a.agent).includes(this.searchTerm)
+        )
     );
   }
 

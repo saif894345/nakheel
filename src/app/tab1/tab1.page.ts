@@ -17,6 +17,7 @@ import {
   monthLabel,
   previousMonthKey,
 } from '../shared/utils/aggregate';
+import { agentNameAr } from '../shared/utils/agent-display-name';
 
 function pctChange(curr: number, prev: number): number | null {
   if (!prev) return null;
@@ -257,7 +258,7 @@ export class Tab1Page implements OnInit {
     const agents = computeAgents(this.filtered);
     const top = [...agents].sort((a, b) => b.total - a.total).slice(0, 8).reverse();
     this.agentsChartData = {
-      labels: top.map((a) => a.agent),
+      labels: top.map((a) => agentNameAr(a.agent)),
       datasets: [
         {
           label: 'عدد المعاملات',
