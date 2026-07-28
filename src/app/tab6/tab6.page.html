@@ -1,19 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
-    <ion-title>آخر يوم نشاط</ion-title>
-  </ion-toolbar>
-
-  <ion-toolbar *ngIf="!loading">
-    <div class="day-chips">
-      <button
-        class="day-chip"
-        *ngFor="let d of recentDays"
-        [class.active]="d === selectedDate"
-        (click)="selectDay(d)"
-      >
-        {{ d }}
-      </button>
-    </div>
+    <ion-title>
+      اليوم الحالي
+      <span class="header-date" *ngIf="!loading">{{ selectedDate }}</span>
+    </ion-title>
   </ion-toolbar>
 
   <ion-toolbar *ngIf="!loading">

@@ -1,27 +1,10 @@
-.day-chips {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 6px 12px 10px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.day-chip {
-  flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: transparent;
-  color: #fff;
-  border-radius: 999px;
-  padding: 6px 12px;
+.header-date {
+  display: block;
   font-size: 12px;
+  font-weight: 400;
+  opacity: 0.85;
   direction: ltr;
-  white-space: nowrap;
-
-  &.active {
-    background: #fff;
-    color: var(--ion-color-primary);
-    font-weight: 700;
-  }
+  margin-top: 2px;
 }
 
 .day-stats-bar {

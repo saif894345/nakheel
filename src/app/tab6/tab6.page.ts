@@ -24,7 +24,6 @@ export class Tab6Page implements OnInit {
   loading = true;
   compactAmount = compactAmount;
 
-  recentDays: string[] = [];
   selectedDate = '';
   dayStats: DayStats = { total: 0, approved: 0, declined: 0, amountIQD: 0 };
 
@@ -43,18 +42,10 @@ export class Tab6Page implements OnInit {
   ngOnInit(): void {
     this.dataSvc.getTransactions().subscribe((tx) => {
       this.allTx = tx;
-      this.recentDays = getLatestDates(tx, 14);
-      this.selectedDate = this.recentDays[0] || '';
+      this.selectedDate = getLatestDates(tx, 1)[0] || '';
       this.applyDay();
       this.loading = false;
     });
-  }
-
-  selectDay(date: string): void {
-    if (this.selectedDate === date) return;
-    this.selectedDate = date;
-    this.expandedKey = null;
-    this.applyDay();
   }
 
   onSearch(ev: CustomEvent): void {
