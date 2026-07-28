@@ -1,10 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest } from 'rxjs';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { DashboardDataService } from '../services/dashboard-data.service';
-import { MonthFilterService } from '../services/month-filter.service';
-import { AgentStat, AgentUserStat, DailyPoint, Transaction } from '../models/dashboard.model';
+import { Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
-import { computeAgentUserStat, computeAgents, computeDaily, filterByMonth } from '../shared/utils/aggregate';
+import { getLatestDates } from '../shared/utils/aggregate';
+
+const PAGE_SIZE = 25;
+
+interface DayStats {
+  total: number;
+  approved: number;
+  declined: number;
+  amountIQD: number;
+}
 
 @Component({
   selector: 'app-tab6',
@@ -14,61 +22,98 @@ import { computeAgentUserStat, computeAgents, computeDaily, filterByMonth } from
 })
 export class Tab6Page implements OnInit {
   loading = true;
-  days: DailyPoint[] = [];
   compactAmount = compactAmount;
 
-  expandedDate: string | null = null;
-  dayAgents: AgentStat[] = [];
+  recentDays: string[] = [];
+  selectedDate = '';
+  dayStats: DayStats = { total: 0, approved: 0, declined: 0, amountIQD: 0 };
 
-  expandedDayAgent: string | null = null;
-  dayAgentUsers: AgentUserStat[] = [];
+  searchTerm = '';
+  statusFilter: 'all' | 'Approved' | 'Declined' = 'all';
+  expandedKey: string | null = null;
 
-  private monthScopedTx: Transaction[] = [];
+  filtered: Transaction[] = [];
+  visible: Transaction[] = [];
 
-  constructor(
-    private dataSvc: DashboardDataService,
-    private filterSvc: MonthFilterService
-  ) {}
+  private allTx: Transaction[] = [];
+  private dayTx: Transaction[] = [];
+
+  constructor(private dataSvc: DashboardDataService) {}
 
   ngOnInit(): void {
-    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(([tx, month]) => {
-      this.monthScopedTx = filterByMonth(tx, month);
-      this.days = [...computeDaily(this.monthScopedTx)].reverse();
-      this.expandedDate = null;
-      this.dayAgents = [];
-      this.expandedDayAgent = null;
-      this.dayAgentUsers = [];
+    this.dataSvc.getTransactions().subscribe((tx) => {
+      this.allTx = tx;
+      this.recentDays = getLatestDates(tx, 14);
+      this.selectedDate = this.recentDays[0] || '';
+      this.applyDay();
       this.loading = false;
     });
   }
 
-  toggleDay(date: string): void {
-    if (this.expandedDate === date) {
-      this.expandedDate = null;
-      this.dayAgents = [];
-      this.expandedDayAgent = null;
-      this.dayAgentUsers = [];
-      return;
-    }
-    this.expandedDate = date;
-    this.dayAgents = computeAgents(this.monthScopedTx.filter((t) => t.date === date));
-    this.expandedDayAgent = null;
-    this.dayAgentUsers = [];
+  selectDay(date: string): void {
+    if (this.selectedDate === date) return;
+    this.selectedDate = date;
+    this.expandedKey = null;
+    this.applyDay();
   }
 
-  toggleDayAgent(agent: string): void {
-    if (this.expandedDayAgent === agent) {
-      this.expandedDayAgent = null;
-      this.dayAgentUsers = [];
-      return;
-    }
-    this.expandedDayAgent = agent;
-    const dayTx = this.monthScopedTx.filter((t) => t.date === this.expandedDate);
-    const users = [...new Set(dayTx.filter((t) => t.agent === agent).map((t) => t.user))].sort();
-    this.dayAgentUsers = users.map((u) => computeAgentUserStat(dayTx, agent, u));
+  onSearch(ev: CustomEvent): void {
+    this.searchTerm = ((ev.detail as any).value || '').trim().toLowerCase();
+    this.applyFilters();
   }
 
-  maxDayTotal(): number {
-    return this.days.reduce((m, d) => Math.max(m, d.total), 1);
+  setStatusFilter(status: 'all' | 'Approved' | 'Declined'): void {
+    this.statusFilter = status;
+    this.applyFilters();
+  }
+
+  toggleExpand(t: Transaction): void {
+    const key = this.rowKey(t);
+    this.expandedKey = this.expandedKey === key ? null : key;
+  }
+
+  rowKey(t: Transaction): string {
+    return `${t.pnr}|${t.time}|${t.amount}|${t.type}`;
+  }
+
+  loadMore(ev: Event): void {
+    const nextLen = this.visible.length + PAGE_SIZE;
+    this.visible = this.filtered.slice(0, nextLen);
+    (ev as InfiniteScrollCustomEvent).target.complete();
+  }
+
+  typeLabel(t: string): string {
+    const map: Record<string, string> = { Auth: 'دفع', Void: 'إلغاء', Credit: 'استرجاع' };
+    return map[t] || t;
+  }
+
+  private applyDay(): void {
+    const rows = this.allTx.filter((t) => t.date === this.selectedDate);
+    this.dayTx = [...rows].sort((a, b) => (a.time < b.time ? 1 : -1));
+
+    const approved = this.dayTx.filter((t) => t.status === 'Approved');
+    this.dayStats = {
+      total: this.dayTx.length,
+      approved: approved.length,
+      declined: this.dayTx.length - approved.length,
+      amountIQD: this.dayTx
+        .filter((t) => t.type === 'Auth' && t.status === 'Approved' && t.currency === 'IQD')
+        .reduce((s, t) => s + t.amount, 0),
+    };
+
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    const term = this.searchTerm;
+    this.filtered = this.dayTx.filter((t) => {
+      if (this.statusFilter !== 'all' && t.status !== this.statusFilter) return false;
+      if (term) {
+        const hay = `${t.pnr} ${t.agent} ${t.user}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    });
+    this.visible = this.filtered.slice(0, PAGE_SIZE);
   }
 }

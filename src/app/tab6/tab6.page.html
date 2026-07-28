@@ -1,84 +1,119 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
-    <ion-title>النشاط اليومي</ion-title>
-    <app-month-select slot="end"></app-month-select>
+    <ion-title>آخر يوم نشاط</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar *ngIf="!loading">
+    <div class="day-chips">
+      <button
+        class="day-chip"
+        *ngFor="let d of recentDays"
+        [class.active]="d === selectedDate"
+        (click)="selectDay(d)"
+      >
+        {{ d }}
+      </button>
+    </div>
+  </ion-toolbar>
+
+  <ion-toolbar *ngIf="!loading">
+    <ion-searchbar
+      placeholder="ابحث برقم الحجز أو الوكيل أو المستخدم"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+
+  <ion-toolbar *ngIf="!loading">
+    <ion-segment [value]="statusFilter" (ionChange)="setStatusFilter($any($event.detail.value))">
+      <ion-segment-button value="all">
+        <ion-label>الكل</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Approved">
+        <ion-label>مقبولة</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Declined">
+        <ion-label>مرفوضة</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="result-count" *ngIf="!loading">
-    <span>{{ days.length }} يوم نشاط</span>
-  </div>
-
-  <div class="days-list" *ngIf="!loading">
-    <ion-card class="day-card" *ngFor="let d of days">
-      <div class="day-top" (click)="toggleDay(d.date)">
-        <div class="day-date">
-          <ion-icon name="calendar-outline"></ion-icon>
-          {{ d.date }}
-        </div>
-        <ion-icon
-          class="chevron"
-          [name]="expandedDate === d.date ? 'chevron-up-outline' : 'chevron-down-outline'"
-        ></ion-icon>
-      </div>
-
-      <div class="day-bar-bg">
-        <div class="day-bar-fill" [style.width.%]="(d.total / maxDayTotal()) * 100"></div>
-      </div>
-
-      <div class="day-stats">
-        <div class="stat">
-          <span class="stat-value">{{ d.total }}</span>
-          <span class="stat-label">معاملة</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value success">{{ d.approved }}</span>
-          <span class="stat-label">مقبولة</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value danger">{{ d.declined }}</span>
-          <span class="stat-label">مرفوضة</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">{{ compactAmount(d.amountIQD) }}</span>
-          <span class="stat-label">د.ع</span>
-        </div>
-      </div>
-
-      <div class="day-detail" *ngIf="expandedDate === d.date">
-        <div class="day-detail-title">
-          <ion-icon name="people-outline"></ion-icon>
-          الوكلاء النشطون هذا اليوم (اضغط على وكيل لعرض المستخدمين)
-        </div>
-
-        <div class="day-agent-row" *ngFor="let a of dayAgents">
-          <div class="day-agent-top" (click)="toggleDayAgent(a.agent)">
-            <span class="agent-name">{{ a.agent }}</span>
-            <span class="agent-mini-stats">{{ a.total }} معاملة · {{ compactAmount(a.amountIQD) }} د.ع</span>
-          </div>
-
-          <div class="day-agent-users" *ngIf="expandedDayAgent === a.agent">
-            <div class="day-agent-user" *ngFor="let u of dayAgentUsers">
-              <span class="user-name">{{ u.user }}</span>
-              <span class="user-mini-stats">{{ u.total }} معاملة · {{ compactAmount(u.amountIQD) }} د.ع</span>
-            </div>
-            <p class="empty-hint" *ngIf="!dayAgentUsers.length">لا يوجد مستخدمون مسجلون لهذا الوكيل هذا اليوم</p>
-          </div>
-        </div>
-
-        <p class="empty-hint" *ngIf="!dayAgents.length">لا توجد معاملات هذا اليوم</p>
-      </div>
-    </ion-card>
-
-    <div class="empty-state" *ngIf="!days.length">
-      <ion-icon name="calendar-outline"></ion-icon>
-      <p>لا توجد بيانات لهذه الفترة</p>
+  <div class="day-stats-bar" *ngIf="!loading">
+    <div class="stat">
+      <span class="stat-value">{{ dayStats.total }}</span>
+      <span class="stat-label">معاملة</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value success">{{ dayStats.approved }}</span>
+      <span class="stat-label">مقبولة</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value danger">{{ dayStats.declined }}</span>
+      <span class="stat-label">مرفوضة</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ compactAmount(dayStats.amountIQD) }}</span>
+      <span class="stat-label">د.ع</span>
     </div>
   </div>
 
+  <div class="result-count" *ngIf="!loading">
+    {{ filtered.length }} من أصل {{ dayStats.total }} معاملة بتاريخ {{ selectedDate }}
+  </div>
+
+  <div class="timeline" *ngIf="!loading">
+    <div class="timeline-item" *ngFor="let t of visible" [class.expanded]="expandedKey === rowKey(t)">
+      <div class="timeline-dot" [class.declined]="t.status === 'Declined'"></div>
+
+      <div class="timeline-card" (click)="toggleExpand(t)">
+        <div class="tl-top">
+          <span class="tl-time">{{ t.time }}</span>
+          <ion-badge [color]="t.status === 'Approved' ? 'success' : 'danger'">
+            {{ t.status === 'Approved' ? 'مقبولة' : 'مرفوضة' }}
+          </ion-badge>
+        </div>
+
+        <div class="tl-mid">
+          <span class="tl-agent">{{ t.agent }}</span>
+          <span class="tl-user">{{ t.user }}</span>
+        </div>
+
+        <div class="tl-bottom">
+          <span class="tl-type">{{ typeLabel(t.type) }} · {{ t.pnr }}</span>
+          <span class="tl-amount">{{ t.amount | amountFormat }} {{ t.currency }}</span>
+        </div>
+
+        <div class="tl-detail" *ngIf="expandedKey === rowKey(t)">
+          <div class="tl-detail-row">
+            <span class="label">نقطة البيع (VPOS)</span>
+            <span class="value">{{ t.vpos }}</span>
+          </div>
+          <div class="tl-detail-row">
+            <span class="label">رمز الحالة</span>
+            <span class="value">{{ t.errorCode || '—' }}</span>
+          </div>
+          <div class="tl-detail-row" *ngIf="t.status === 'Declined' && t.errMessage">
+            <span class="label">سبب الرفض</span>
+            <span class="value err">{{ t.errMessage }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!visible.length">
+      <ion-icon name="file-tray-outline"></ion-icon>
+      <p>لا توجد معاملات مطابقة</p>
+    </div>
+  </div>
+
+  <ion-infinite-scroll *ngIf="visible.length < filtered.length" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingText="جارِ تحميل المزيد..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
   <div class="loading-wrap" *ngIf="loading">
     <ion-spinner name="crescent"></ion-spinner>
-    <p>جارِ تحميل النشاط اليومي...</p>
+    <p>جارِ تحميل آخر يوم نشاط...</p>
   </div>
 </ion-content>
