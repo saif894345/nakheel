@@ -67,10 +67,7 @@
   --app-border-color: rgba(0, 0, 0, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ion-background-color: #0f1115;
-    --ion-card-background: #1a1d23;
-    --app-border-color: rgba(255, 255, 255, 0.08);
-  }
-}
+// The branded off-white/bronze look is intentionally the only theme - the
+// dashboard no longer switches to a dark theme based on the viewer's system
+// preference, so it always matches the Global Aviation brand regardless of
+// device settings.
