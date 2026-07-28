@@ -1,29 +1,31 @@
 // Professional payments-dashboard theme (Global Aviation)
+// Brand colors approximated from the Global Aviation brand guide (gold/bronze
+// livery gradient) on a white/off-white base, per the business owner's brand.
 // For more info: http://ionicframework.com/docs/theming/
 
 :root {
   --ion-font-family: 'Segoe UI', Tahoma, Geneva, Arial, sans-serif;
 
-  --ion-color-primary: #1a56db;
-  --ion-color-primary-rgb: 26, 86, 219;
+  --ion-color-primary: #6e4e22;
+  --ion-color-primary-rgb: 110, 78, 34;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #174cc1;
-  --ion-color-primary-tint: #3167e0;
+  --ion-color-primary-shade: #61451e;
+  --ion-color-primary-tint: #7f633d;
 
-  --ion-color-secondary: #0f766e;
-  --ion-color-secondary-rgb: 15, 118, 110;
+  --ion-color-secondary: #a97d2f;
+  --ion-color-secondary-rgb: 169, 125, 47;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #0d6961;
-  --ion-color-secondary-tint: #27847c;
+  --ion-color-secondary-shade: #956e29;
+  --ion-color-secondary-tint: #b38d48;
 
-  --ion-color-tertiary: #624cda;
-  --ion-color-tertiary-rgb: 98, 76, 218;
+  --ion-color-tertiary: #c9962e;
+  --ion-color-tertiary-rgb: 201, 150, 46;
   --ion-color-tertiary-contrast: #ffffff;
   --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #5643c0;
-  --ion-color-tertiary-tint: #715ede;
+  --ion-color-tertiary-shade: #b18428;
+  --ion-color-tertiary-tint: #d1a94c;
 
   --ion-color-success: #1f9d54;
   --ion-color-success-rgb: 31, 157, 84;
@@ -60,7 +62,8 @@
   --ion-color-light-shade: #d7d9db;
   --ion-color-light-tint: #f5f7fa;
 
-  --ion-background-color: #f4f6f9;
+  --ion-background-color: #faf7f2;
+  --ion-card-background: #ffffff;
   --app-border-color: rgba(0, 0, 0, 0.06);
 }
 

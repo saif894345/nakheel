@@ -25,11 +25,11 @@ function pctChange(curr: number, prev: number): number | null {
 }
 
 const COLORS = {
-  primary: '#3880ff',
+  primary: '#6e4e22',
   success: '#2dd36f',
   danger: '#eb445a',
   warning: '#ffc409',
-  tertiary: '#624cda',
+  tertiary: '#c9962e',
   medium: '#92949c',
 };
 
@@ -165,7 +165,7 @@ export class Tab1Page implements OnInit {
           type: 'bar',
           label: 'المبلغ (دينار)',
           data: points.map((p) => p.amountIQD),
-          backgroundColor: 'rgba(56,128,255,0.35)',
+          backgroundColor: 'rgba(110,78,34,0.35)',
           borderColor: COLORS.primary,
           borderWidth: 1,
           yAxisID: 'y1',
