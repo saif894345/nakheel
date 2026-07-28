@@ -12,7 +12,12 @@ export class DashboardDataService {
 
   getTransactions(): Observable<Transaction[]> {
     if (!this.transactions$) {
-      this.transactions$ = this.http.get<Transaction[]>('assets/data/transactions.json').pipe(
+      // Cache-bust with a per-load timestamp: transactions.json has a fixed
+      // filename (unlike the hashed JS bundles), so without this, browsers
+      // - especially mobile, where there's no real "hard refresh" gesture -
+      // can keep serving a stale copy from before the latest daily update.
+      const bust = Date.now();
+      this.transactions$ = this.http.get<Transaction[]>(`assets/data/transactions.json?v=${bust}`).pipe(
         map((rows) => rows.map((t) => ({ ...t, agent: canonicalAgent(t.agent) }))),
         shareReplay(1)
       );
