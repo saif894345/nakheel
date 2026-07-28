@@ -27,7 +27,7 @@ export class Tab3Page implements OnInit {
   expandedAgent: string | null = null;
   expandedUser: string | null = null;
   expandedStat?: AgentUserStat;
-  userDaily: DailyPoint[] = [];
+  userTransactions: Transaction[] = [];
 
   expandedAgentDaily: string | null = null;
   agentDaily: DailyPoint[] = [];
@@ -50,7 +50,7 @@ export class Tab3Page implements OnInit {
         this.expandedAgent = null;
         this.expandedUser = null;
         this.expandedStat = undefined;
-        this.userDaily = [];
+        this.userTransactions = [];
         this.expandedAgentDaily = null;
         this.agentDaily = [];
         this.usersListOpenFor.clear();
@@ -86,7 +86,7 @@ export class Tab3Page implements OnInit {
     this.expandedAgent = null;
     this.expandedUser = null;
     this.expandedStat = undefined;
-    this.userDaily = [];
+    this.userTransactions = [];
     this.expandedAgentDaily = null;
     this.agentDaily = [];
     if (this.searchTerm) {
@@ -96,7 +96,7 @@ export class Tab3Page implements OnInit {
           this.expandedAgent = a.agent;
           this.expandedUser = matchedUser;
           this.expandedStat = computeAgentUserStat(this.monthScopedTx, a.agent, matchedUser);
-          this.userDaily = this.dailyFor(a.agent, matchedUser);
+          this.userTransactions = this.transactionsFor(a.agent, matchedUser);
           this.usersListOpenFor.add(a.agent);
           break;
         }
@@ -113,13 +113,13 @@ export class Tab3Page implements OnInit {
       this.expandedAgent = null;
       this.expandedUser = null;
       this.expandedStat = undefined;
-      this.userDaily = [];
+      this.userTransactions = [];
       return;
     }
     this.expandedAgent = agent;
     this.expandedUser = user;
     this.expandedStat = computeAgentUserStat(this.monthScopedTx, agent, user);
-    this.userDaily = this.dailyFor(agent, user);
+    this.userTransactions = this.transactionsFor(agent, user);
   }
 
   toggleUsersList(agent: string): void {
@@ -146,6 +146,14 @@ export class Tab3Page implements OnInit {
       (t) => t.agent === agent && (!user || t.user === user)
     );
     return computeDaily(rows).slice(-14).reverse();
+  }
+
+  /** Last 30 transactions (with PNR), newest first, for this agent+user pair. */
+  private transactionsFor(agent: string, user: string): Transaction[] {
+    return this.monthScopedTx
+      .filter((t) => t.agent === agent && t.user === user)
+      .sort((a, b) => (a.date + a.time < b.date + b.time ? 1 : -1))
+      .slice(0, 30);
   }
 
   exportCsv(): void {

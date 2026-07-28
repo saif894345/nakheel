@@ -143,24 +143,26 @@
           <span *ngIf="expandedStat.amountUSD">+ {{ expandedStat.amountUSD | amountFormat }} $</span>
         </div>
 
-        <div class="daily-breakdown user-daily">
+        <div class="daily-breakdown user-daily tx-breakdown">
           <div class="daily-breakdown-title">
-            <ion-icon name="calendar-outline"></ion-icon>
-            آخر أيام نشاط هذا المستخدم
+            <ion-icon name="receipt-outline"></ion-icon>
+            آخر معاملات هذا المستخدم (بالتفاصيل)
           </div>
-          <div class="daily-row daily-header">
-            <span>التاريخ</span>
-            <span>معاملات</span>
-            <span>مقبولة</span>
-            <span>المبلغ (د.ع)</span>
+          <div class="tx-row tx-header">
+            <span>PNR</span>
+            <span>التاريخ والوقت</span>
+            <span>الحالة</span>
+            <span>المبلغ</span>
           </div>
-          <div class="daily-row" *ngFor="let d of userDaily">
-            <span>{{ d.date }}</span>
-            <span>{{ d.total }}</span>
-            <span class="success">{{ d.approved }}</span>
-            <span>{{ compactAmount(d.amountIQD) }}</span>
+          <div class="tx-row" *ngFor="let t of userTransactions">
+            <span class="tx-pnr">{{ t.pnr }}</span>
+            <span>{{ t.date }} {{ t.time }}</span>
+            <span [class.success]="t.status === 'Approved'" [class.danger]="t.status === 'Declined'">
+              {{ t.status === 'Approved' ? 'مقبولة' : 'مرفوضة' }}
+            </span>
+            <span>{{ t.amount | amountFormat }} {{ t.currency }}</span>
           </div>
-          <p class="empty-hint" *ngIf="!userDaily.length">لا توجد بيانات كافية لهذه الفترة</p>
+          <p class="empty-hint" *ngIf="!userTransactions.length">لا توجد بيانات كافية لهذه الفترة</p>
         </div>
       </div>
     </ion-card>
