@@ -102,13 +102,43 @@
   color: var(--ion-color-medium);
 }
 
+.users-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border: none;
+  border-top: 1px dashed var(--app-border-color);
+  background: transparent;
+  color: var(--ion-color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 14px;
+  }
+
+  .chevron {
+    font-size: 12px;
+    color: var(--ion-color-medium);
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
 .agent-users {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px dashed var(--app-border-color);
   font-size: 11px;
 

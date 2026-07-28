@@ -89,8 +89,20 @@
         <p class="empty-hint" *ngIf="!agentDaily.length">لا توجد بيانات كافية لهذه الفترة</p>
       </div>
 
-      <div class="agent-users" *ngIf="a.users.length">
-        <ion-icon name="person-outline"></ion-icon>
+      <button
+        class="users-toggle"
+        *ngIf="a.users.length"
+        (click)="toggleUsersList(a.agent)"
+      >
+        <ion-icon name="people-outline"></ion-icon>
+        {{ usersListOpenFor.has(a.agent) ? 'إخفاء المستخدمين' : 'عرض المستخدمين' }} ({{ a.users.length }})
+        <ion-icon
+          class="chevron"
+          [name]="usersListOpenFor.has(a.agent) ? 'chevron-up-outline' : 'chevron-down-outline'"
+        ></ion-icon>
+      </button>
+
+      <div class="agent-users" *ngIf="a.users.length && usersListOpenFor.has(a.agent)">
         <span class="users-label">أضاف المبلغ (اضغط للتفاصيل):</span>
         <ion-badge
           color="medium"

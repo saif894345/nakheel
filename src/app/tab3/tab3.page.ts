@@ -32,6 +32,8 @@ export class Tab3Page implements OnInit {
   expandedAgentDaily: string | null = null;
   agentDaily: DailyPoint[] = [];
 
+  usersListOpenFor = new Set<string>();
+
   private monthScopedTx: Transaction[] = [];
 
   constructor(
@@ -51,6 +53,7 @@ export class Tab3Page implements OnInit {
         this.userDaily = [];
         this.expandedAgentDaily = null;
         this.agentDaily = [];
+        this.usersListOpenFor.clear();
         this.loading = false;
       }
     );
@@ -94,6 +97,7 @@ export class Tab3Page implements OnInit {
           this.expandedUser = matchedUser;
           this.expandedStat = computeAgentUserStat(this.monthScopedTx, a.agent, matchedUser);
           this.userDaily = this.dailyFor(a.agent, matchedUser);
+          this.usersListOpenFor.add(a.agent);
           break;
         }
       }
@@ -116,6 +120,14 @@ export class Tab3Page implements OnInit {
     this.expandedUser = user;
     this.expandedStat = computeAgentUserStat(this.monthScopedTx, agent, user);
     this.userDaily = this.dailyFor(agent, user);
+  }
+
+  toggleUsersList(agent: string): void {
+    if (this.usersListOpenFor.has(agent)) {
+      this.usersListOpenFor.delete(agent);
+    } else {
+      this.usersListOpenFor.add(agent);
+    }
   }
 
   toggleAgentDaily(agent: string): void {
