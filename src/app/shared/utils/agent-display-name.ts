@@ -7,8 +7,6 @@ const AGENT_NAME_AR: Record<string, string> = {
   'AL RAFDEEN': 'الرافدين',
   'TAREEK ALOFK': 'طريق الأفق',
   INTERNET: 'الإنترنت',
-  COMMERCIAL: 'تجاري',
-  FLYLATNAS: 'فلاي لات ناس',
 };
 
 export function agentNameAr(agent: string): string {
