@@ -136,3 +136,20 @@ export interface UserPermission {
   salesLevel: number;
   roles: string[];
 }
+
+/** A confirmed policy violation reported by the business owner with evidence
+ * (e.g. a ticket issued/paid under a test account), not an automatically
+ * detected statistical pattern. */
+export interface Violation {
+  pnr: string;
+  title: string;
+  description: string;
+  agent: string;
+  user: string;
+  amount: number;
+  currency: string;
+  date: string;
+  time: string;
+  passengers: string[];
+  ticketNumbers: string[];
+}

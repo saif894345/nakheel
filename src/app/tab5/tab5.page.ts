@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
-import { BurstFlag, LargeAmountFlag, ReissueFlag } from '../models/dashboard.model';
+import { ViolationsService } from '../services/violations.service';
+import { BurstFlag, LargeAmountFlag, ReissueFlag, Violation } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import {
   computeBursts,
@@ -12,7 +13,7 @@ import {
 } from '../shared/utils/aggregate';
 import { agentNameAr } from '../shared/utils/agent-display-name';
 
-type Category = 'reissue' | 'burst' | 'large';
+type Category = 'violation' | 'reissue' | 'burst' | 'large';
 
 @Component({
   selector: 'app-tab5',
@@ -22,13 +23,15 @@ type Category = 'reissue' | 'burst' | 'large';
 })
 export class Tab5Page implements OnInit {
   loading = true;
-  category: Category = 'reissue';
+  category: Category = 'violation';
   searchTerm = '';
 
+  allViolations: Violation[] = [];
   allReissues: ReissueFlag[] = [];
   allBursts: BurstFlag[] = [];
   allLarge: LargeAmountFlag[] = [];
 
+  visibleViolations: Violation[] = [];
   visibleReissues: ReissueFlag[] = [];
   visibleBursts: BurstFlag[] = [];
   visibleLarge: LargeAmountFlag[] = [];
@@ -37,20 +40,27 @@ export class Tab5Page implements OnInit {
 
   constructor(
     private dataSvc: DashboardDataService,
-    private filterSvc: MonthFilterService
+    private filterSvc: MonthFilterService,
+    private violationsSvc: ViolationsService
   ) {}
 
   ngOnInit(): void {
-    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
-      ([tx, month]) => {
-        const scoped = filterByMonth(tx, month);
-        this.allReissues = computeReissues(scoped);
-        this.allBursts = computeBursts(scoped);
-        this.allLarge = computeLargeAmountOutliers(scoped);
-        this.applyFilters();
-        this.loading = false;
-      }
-    );
+    combineLatest([
+      this.dataSvc.getTransactions(),
+      this.filterSvc.month$,
+      this.violationsSvc.getViolations(),
+    ]).subscribe(([tx, month, violations]) => {
+      const scoped = filterByMonth(tx, month);
+      this.allViolations =
+        !month || month === 'all'
+          ? violations
+          : violations.filter((v) => v.date.slice(0, 7) === month);
+      this.allReissues = computeReissues(scoped);
+      this.allBursts = computeBursts(scoped);
+      this.allLarge = computeLargeAmountOutliers(scoped);
+      this.applyFilters();
+      this.loading = false;
+    });
   }
 
   setCategory(cat: Category): void {
@@ -65,6 +75,16 @@ export class Tab5Page implements OnInit {
 
   private applyFilters(): void {
     const term = this.searchTerm;
+    this.visibleViolations = !term
+      ? this.allViolations
+      : this.allViolations.filter(
+          (v) =>
+            v.pnr.toLowerCase().includes(term) ||
+            v.agent.toLowerCase().includes(term) ||
+            agentNameAr(v.agent).includes(term) ||
+            v.user.toLowerCase().includes(term) ||
+            v.passengers.some((p) => p.toLowerCase().includes(term))
+        );
     this.visibleReissues = !term
       ? this.allReissues
       : this.allReissues.filter(

@@ -14,13 +14,24 @@
 
 <ion-content>
   <div class="page-wrap" *ngIf="!loading">
-    <p class="hint-banner">
+    <p class="hint-banner" *ngIf="category !== 'violation'">
       هذه أنماط تلقائية تستحق المراجعة، وليست بالضرورة عمليات احتيال مؤكدة.
+    </p>
+    <p class="hint-banner violation-banner" *ngIf="category === 'violation'">
+      هذه حالات مؤكدة بالأدلة (تذاكر/مستندات)، وليست أنماطاً إحصائية تلقائية.
     </p>
 
     <ion-grid class="kpi-grid">
       <ion-row>
-        <ion-col size="12" size-sm="4">
+        <ion-col size="12" size-sm="3">
+          <app-kpi-card
+            label="مخالفات موثقة"
+            [value]="allViolations.length | amountFormat"
+            icon="alert-circle-outline"
+            color="danger"
+          ></app-kpi-card>
+        </ion-col>
+        <ion-col size="12" size-sm="3">
           <app-kpi-card
             label="إلغاء ثم إعادة دفع بنفس المبلغ"
             [value]="allReissues.length | amountFormat"
@@ -28,7 +39,7 @@
             color="warning"
           ></app-kpi-card>
         </ion-col>
-        <ion-col size="12" size-sm="4">
+        <ion-col size="12" size-sm="3">
           <app-kpi-card
             label="نشاط سريع غير اعتيادي"
             [value]="allBursts.length | amountFormat"
@@ -36,18 +47,21 @@
             color="tertiary"
           ></app-kpi-card>
         </ion-col>
-        <ion-col size="12" size-sm="4">
+        <ion-col size="12" size-sm="3">
           <app-kpi-card
             label="مبالغ شاذة عن المتوسط"
             [value]="allLarge.length | amountFormat"
             icon="trending-up-outline"
-            color="danger"
+            color="primary"
           ></app-kpi-card>
         </ion-col>
       </ion-row>
     </ion-grid>
 
     <ion-segment [value]="category" (ionChange)="setCategory($any($event.detail.value))" class="cat-segment">
+      <ion-segment-button value="violation">
+        <ion-label>مخالفات</ion-label>
+      </ion-segment-button>
       <ion-segment-button value="reissue">
         <ion-label>إلغاء وإعادة دفع</ion-label>
       </ion-segment-button>
@@ -58,6 +72,32 @@
         <ion-label>مبالغ شاذة</ion-label>
       </ion-segment-button>
     </ion-segment>
+
+    <!-- Confirmed violations -->
+    <div class="list-wrap" *ngIf="category === 'violation'">
+      <div class="result-count">{{ visibleViolations.length }} حالة</div>
+      <ion-card class="flag-card violation-card" *ngFor="let v of visibleViolations">
+        <div class="flag-top">
+          <span class="flag-pnr">{{ v.pnr }}</span>
+          <ion-badge color="danger">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
+        </div>
+        <div class="violation-title">{{ v.title }}</div>
+        <div class="flag-mid">
+          <span>{{ v.agent | agentName }}</span>
+          <span class="flag-user">{{ v.user }}</span>
+        </div>
+        <p class="violation-desc">{{ v.description }}</p>
+        <div class="violation-passengers" *ngIf="v.passengers.length">
+          <ion-icon name="people-outline"></ion-icon>
+          <span>{{ v.passengers.join(' · ') }}</span>
+        </div>
+        <div class="flag-gap">{{ v.date }} · {{ v.time }}</div>
+      </ion-card>
+      <div class="empty-state" *ngIf="!visibleViolations.length">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+        <p>لا توجد مخالفات موثقة مطابقة</p>
+      </div>
+    </div>
 
     <!-- Void + reauth same amount -->
     <div class="list-wrap" *ngIf="category === 'reissue'">
