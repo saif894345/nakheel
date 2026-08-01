@@ -125,3 +125,14 @@ export interface Transaction {
   errorCode: string;
   errMessage: string;
 }
+
+export interface UserPermission {
+  logonId: string;
+  fullName: string;
+  banned: boolean;
+  portCode: string;
+  srCode: string;
+  srName: string;
+  salesLevel: number;
+  roles: string[];
+}

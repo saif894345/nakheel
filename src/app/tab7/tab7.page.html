@@ -1,0 +1,107 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>صلاحيات المستخدمين</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="ابحث باسم المستخدم أو الوكيل/المحطة"
+      (ionInput)="onSearch($event)"
+      debounce="250"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid class="kpi-grid" *ngIf="!loading">
+    <ion-row>
+      <ion-col size="12" size-sm="4">
+        <app-kpi-card
+          label="عدد المستخدمين"
+          [value]="totalUsers | amountFormat"
+          icon="people-outline"
+          color="primary"
+        ></app-kpi-card>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <app-kpi-card
+          label="التعيينات الوظيفية"
+          [value]="totalRoleAssignments | amountFormat"
+          icon="key-outline"
+          color="tertiary"
+        ></app-kpi-card>
+      </ion-col>
+      <ion-col size="12" size-sm="4">
+        <app-kpi-card
+          label="الوكلاء والمحطات"
+          [value]="totalStations | amountFormat"
+          icon="business-outline"
+          color="success"
+        ></app-kpi-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <div class="result-count" *ngIf="!loading">
+    {{ filtered.length }} من أصل {{ totalUsers }} مستخدم
+  </div>
+
+  <div class="users-list" *ngIf="!loading">
+    <ion-card class="user-card" *ngFor="let u of visible">
+      <div class="user-top">
+        <div class="user-name">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <div>
+            <div class="full-name">{{ u.fullName }}</div>
+            <div class="logon-id">{{ u.logonId }}</div>
+          </div>
+        </div>
+        <ion-badge color="warning" *ngIf="u.banned">محظور</ion-badge>
+      </div>
+
+      <div class="user-meta">
+        <span class="meta-chip" *ngIf="u.srName">
+          <ion-icon name="business-outline"></ion-icon>
+          {{ agentNameAr(u.srName) }}
+        </span>
+        <span class="meta-chip" *ngIf="u.portCode">
+          <ion-icon name="location-outline"></ion-icon>
+          {{ u.portCode }}
+        </span>
+        <span class="meta-chip">
+          <ion-icon name="star-outline"></ion-icon>
+          مستوى المبيعات {{ u.salesLevel }}
+        </span>
+      </div>
+
+      <button class="roles-toggle" (click)="toggleRoles(u.logonId)">
+        <ion-icon name="key-outline"></ion-icon>
+        {{ expandedRolesFor.has(u.logonId) ? 'إخفاء الصلاحيات' : 'عرض الصلاحيات' }} ({{ u.roles.length }})
+        <ion-icon
+          class="chevron"
+          [name]="expandedRolesFor.has(u.logonId) ? 'chevron-up-outline' : 'chevron-down-outline'"
+        ></ion-icon>
+      </button>
+
+      <div class="roles-list" *ngIf="expandedRolesFor.has(u.logonId)">
+        <div class="role-item" *ngFor="let r of u.roles">
+          <div class="role-code">{{ r }}</div>
+          <div class="role-desc">{{ roleLabel(r) }}</div>
+        </div>
+      </div>
+    </ion-card>
+
+    <div class="empty-state" *ngIf="!visible.length">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>لا يوجد مستخدمون مطابقون</p>
+    </div>
+  </div>
+
+  <ion-infinite-scroll *ngIf="visible.length < filtered.length" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingText="جارِ تحميل المزيد..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <div class="loading-wrap" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>جارِ تحميل صلاحيات المستخدمين...</p>
+  </div>
+</ion-content>

@@ -1,1 +1,24 @@
+ion-tab-button {
+  font-size: 10px;
 
+  ion-icon {
+    font-size: 19px;
+  }
+
+  ion-label {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  ion-tab-button {
+    ion-icon {
+      font-size: 17px;
+    }
+
+    ion-label {
+      font-size: 9px;
+    }
+  }
+}
