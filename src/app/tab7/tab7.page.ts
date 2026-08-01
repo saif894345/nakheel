@@ -4,8 +4,11 @@ import { UserPermissionsService } from '../services/user-permissions.service';
 import { UserPermission } from '../models/dashboard.model';
 import { roleLabel } from '../shared/utils/role-labels';
 import { agentNameAr } from '../shared/utils/agent-display-name';
+import { isEmployeeSr } from '../shared/utils/user-group';
 
 const PAGE_SIZE = 30;
+
+type Group = 'all' | 'agent' | 'employee';
 
 @Component({
   selector: 'app-tab7',
@@ -19,14 +22,16 @@ export class Tab7Page implements OnInit {
   filtered: UserPermission[] = [];
   visible: UserPermission[] = [];
   searchTerm = '';
+  group: Group = 'all';
 
   totalUsers = 0;
-  totalRoleAssignments = 0;
-  totalStations = 0;
+  agentUsers = 0;
+  employeeUsers = 0;
 
   expandedRolesFor = new Set<string>();
   roleLabel = roleLabel;
   agentNameAr = agentNameAr;
+  isEmployeeSr = isEmployeeSr;
 
   constructor(private usersSvc: UserPermissionsService) {}
 
@@ -34,8 +39,8 @@ export class Tab7Page implements OnInit {
     this.usersSvc.getUsers().subscribe((users) => {
       this.all = [...users].sort((a, b) => a.fullName.localeCompare(b.fullName));
       this.totalUsers = users.length;
-      this.totalRoleAssignments = users.reduce((s, u) => s + u.roles.length, 0);
-      this.totalStations = new Set(users.map((u) => u.srName).filter(Boolean)).size;
+      this.employeeUsers = users.filter((u) => isEmployeeSr(u.srName)).length;
+      this.agentUsers = this.totalUsers - this.employeeUsers;
       this.applyFilters();
       this.loading = false;
     });
@@ -43,6 +48,11 @@ export class Tab7Page implements OnInit {
 
   onSearch(ev: CustomEvent): void {
     this.searchTerm = ((ev.detail as any).value || '').trim().toLowerCase();
+    this.applyFilters();
+  }
+
+  setGroup(group: Group): void {
+    this.group = group;
     this.applyFilters();
   }
 
@@ -62,9 +72,15 @@ export class Tab7Page implements OnInit {
 
   private applyFilters(): void {
     const term = this.searchTerm;
+    let list = this.all;
+    if (this.group === 'agent') {
+      list = list.filter((u) => !isEmployeeSr(u.srName));
+    } else if (this.group === 'employee') {
+      list = list.filter((u) => isEmployeeSr(u.srName));
+    }
     this.filtered = !term
-      ? this.all
-      : this.all.filter((u) => {
+      ? list
+      : list.filter((u) => {
           const hay = `${u.logonId} ${u.fullName} ${u.srName} ${agentNameAr(u.srName)} ${u.portCode}`.toLowerCase();
           return hay.includes(term);
         });

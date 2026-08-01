@@ -28,6 +28,13 @@
   margin-bottom: 8px;
 }
 
+.badge-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .user-name {
   display: flex;
   align-items: center;

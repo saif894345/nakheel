@@ -9,6 +9,19 @@
       debounce="250"
     ></ion-searchbar>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="group" (ionChange)="setGroup($any($event.detail.value))">
+      <ion-segment-button value="all">
+        <ion-label>الكل</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="agent">
+        <ion-label>الوكلاء</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="employee">
+        <ion-label>الموظفون</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -24,16 +37,16 @@
       </ion-col>
       <ion-col size="12" size-sm="4">
         <app-kpi-card
-          label="التعيينات الوظيفية"
-          [value]="totalRoleAssignments | amountFormat"
-          icon="key-outline"
+          label="مستخدمو الوكلاء"
+          [value]="agentUsers | amountFormat"
+          icon="briefcase-outline"
           color="tertiary"
         ></app-kpi-card>
       </ion-col>
       <ion-col size="12" size-sm="4">
         <app-kpi-card
-          label="الوكلاء والمحطات"
-          [value]="totalStations | amountFormat"
+          label="الموظفون الداخليون"
+          [value]="employeeUsers | amountFormat"
           icon="business-outline"
           color="success"
         ></app-kpi-card>
@@ -55,7 +68,12 @@
             <div class="logon-id">{{ u.logonId }}</div>
           </div>
         </div>
-        <ion-badge color="warning" *ngIf="u.banned">محظور</ion-badge>
+        <div class="badge-stack">
+          <ion-badge [color]="isEmployeeSr(u.srName) ? 'success' : 'tertiary'">
+            {{ isEmployeeSr(u.srName) ? 'موظف' : 'وكيل' }}
+          </ion-badge>
+          <ion-badge color="warning" *ngIf="u.banned">محظور</ion-badge>
+        </div>
       </div>
 
       <div class="user-meta">
