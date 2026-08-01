@@ -39,7 +39,7 @@ export class Tab7Page implements OnInit {
     this.usersSvc.getUsers().subscribe((users) => {
       this.all = [...users].sort((a, b) => a.fullName.localeCompare(b.fullName));
       this.totalUsers = users.length;
-      this.employeeUsers = users.filter((u) => isEmployeeSr(u.srName)).length;
+      this.employeeUsers = users.filter((u) => isEmployeeSr(u.srCode)).length;
       this.agentUsers = this.totalUsers - this.employeeUsers;
       this.applyFilters();
       this.loading = false;
@@ -74,9 +74,9 @@ export class Tab7Page implements OnInit {
     const term = this.searchTerm;
     let list = this.all;
     if (this.group === 'agent') {
-      list = list.filter((u) => !isEmployeeSr(u.srName));
+      list = list.filter((u) => !isEmployeeSr(u.srCode));
     } else if (this.group === 'employee') {
-      list = list.filter((u) => isEmployeeSr(u.srName));
+      list = list.filter((u) => isEmployeeSr(u.srCode));
     }
     this.filtered = !term
       ? list

@@ -69,8 +69,8 @@
           </div>
         </div>
         <div class="badge-stack">
-          <ion-badge [color]="isEmployeeSr(u.srName) ? 'success' : 'tertiary'">
-            {{ isEmployeeSr(u.srName) ? 'موظف' : 'وكيل' }}
+          <ion-badge [color]="isEmployeeSr(u.srCode) ? 'success' : 'tertiary'">
+            {{ isEmployeeSr(u.srCode) ? 'موظف' : 'وكيل' }}
           </ion-badge>
           <ion-badge color="warning" *ngIf="u.banned">محظور</ion-badge>
         </div>
