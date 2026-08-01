@@ -76,12 +76,12 @@
     <!-- Confirmed violations -->
     <div class="list-wrap" *ngIf="category === 'violation'">
       <div class="result-count">{{ visibleViolations.length }} حالة</div>
-      <ion-card class="flag-card violation-card" *ngFor="let v of visibleViolations">
+      <ion-card class="flag-card violation-card" [class.approved]="v.approvalNote" *ngFor="let v of visibleViolations">
         <div class="flag-top">
           <span class="flag-pnr">{{ v.pnr }}</span>
-          <ion-badge color="danger">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
+          <ion-badge [color]="v.approvalNote ? 'success' : 'danger'">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
         </div>
-        <div class="violation-title">{{ v.title }}</div>
+        <div class="violation-title" [class.approved-title]="v.approvalNote">{{ v.title }}</div>
         <div class="flag-mid">
           <span>{{ v.agent | agentName }}</span>
           <span class="flag-user">{{ v.user }}</span>
@@ -90,6 +90,10 @@
         <div class="violation-passengers" *ngIf="v.passengers.length">
           <ion-icon name="people-outline"></ion-icon>
           <span>{{ v.passengers.join(' · ') }}</span>
+        </div>
+        <div class="violation-approval" *ngIf="v.approvalNote">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ v.approvalNote }}</span>
         </div>
         <div class="flag-gap">{{ v.date }} · {{ v.time }}</div>
       </ion-card>

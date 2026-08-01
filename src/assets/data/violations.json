@@ -24,5 +24,19 @@
     "time": "17:17:16",
     "passengers": ["ALMALEESI/ADNAN MR", "ALMALES/MAHMOOD MR", "ALBONISAN/ADNAN MR"],
     "ticketNumbers": ["999 2400064648", "999 2400064649", "999 2400064650"]
+  },
+  {
+    "pnr": "11LL3Y",
+    "title": "حجز شخصي لموظف باستخدام حساب المكتب",
+    "description": "تذكرة بغداد-بيروت-بغداد (رحلتي IG 111 / IG 112) للراكب YASEEN/HAYDER MR، صدرت ودُفعت نقداً عن طريق حساب SCHEDULE / المستخدم Bannded User. حسب توضيح صاحب العمل: حجز شخصي للموظف نفسه استخدم فيه حساب المكتب الداخلي.",
+    "agent": "SCHEDULE",
+    "user": "Bannded User",
+    "amount": 438952,
+    "currency": "IQD",
+    "date": "2026-06-03",
+    "time": "01:19:16",
+    "passengers": ["YASEEN/HAYDER MR"],
+    "ticketNumbers": ["999 2400039012"],
+    "approvalNote": "بموافقة المدير المسبقة"
   }
 ]
