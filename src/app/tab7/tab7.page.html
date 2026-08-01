@@ -10,12 +10,15 @@
     ></ion-searchbar>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-segment [value]="group" (ionChange)="setGroup($any($event.detail.value))">
+    <ion-segment [value]="filter" (ionChange)="setFilter($any($event.detail.value))">
       <ion-segment-button value="all">
         <ion-label>الكل</ion-label>
       </ion-segment-button>
       <ion-segment-button value="agent">
         <ion-label>الوكلاء</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="commercial">
+        <ion-label>التجارية</ion-label>
       </ion-segment-button>
       <ion-segment-button value="employee">
         <ion-label>الموظفون</ion-label>
@@ -27,7 +30,7 @@
 <ion-content>
   <ion-grid class="kpi-grid" *ngIf="!loading">
     <ion-row>
-      <ion-col size="12" size-sm="4">
+      <ion-col size="6" size-sm="3">
         <app-kpi-card
           label="عدد المستخدمين"
           [value]="totalUsers | amountFormat"
@@ -35,7 +38,7 @@
           color="primary"
         ></app-kpi-card>
       </ion-col>
-      <ion-col size="12" size-sm="4">
+      <ion-col size="6" size-sm="3">
         <app-kpi-card
           label="مستخدمو الوكلاء"
           [value]="agentUsers | amountFormat"
@@ -43,7 +46,15 @@
           color="tertiary"
         ></app-kpi-card>
       </ion-col>
-      <ion-col size="12" size-sm="4">
+      <ion-col size="6" size-sm="3">
+        <app-kpi-card
+          label="موظفو التجارية"
+          [value]="commercialUsers | amountFormat"
+          icon="cash-outline"
+          color="warning"
+        ></app-kpi-card>
+      </ion-col>
+      <ion-col size="6" size-sm="3">
         <app-kpi-card
           label="الموظفون الداخليون"
           [value]="employeeUsers | amountFormat"
@@ -69,8 +80,10 @@
           </div>
         </div>
         <div class="badge-stack">
-          <ion-badge [color]="isEmployeeSr(u.srCode) ? 'success' : 'tertiary'">
-            {{ isEmployeeSr(u.srCode) ? 'موظف' : 'وكيل' }}
+          <ion-badge
+            [color]="userGroup(u.srCode) === 'agent' ? 'tertiary' : userGroup(u.srCode) === 'commercial' ? 'warning' : 'success'"
+          >
+            {{ userGroup(u.srCode) === 'agent' ? 'وكيل' : userGroup(u.srCode) === 'commercial' ? 'تجارية' : 'موظف' }}
           </ion-badge>
           <ion-badge color="warning" *ngIf="u.banned">محظور</ion-badge>
         </div>

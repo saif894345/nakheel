@@ -4,11 +4,11 @@ import { UserPermissionsService } from '../services/user-permissions.service';
 import { UserPermission } from '../models/dashboard.model';
 import { roleLabel } from '../shared/utils/role-labels';
 import { agentNameAr } from '../shared/utils/agent-display-name';
-import { isEmployeeSr } from '../shared/utils/user-group';
+import { userGroup, UserGroup } from '../shared/utils/user-group';
 
 const PAGE_SIZE = 30;
 
-type Group = 'all' | 'agent' | 'employee';
+type Filter = 'all' | UserGroup;
 
 @Component({
   selector: 'app-tab7',
@@ -22,16 +22,17 @@ export class Tab7Page implements OnInit {
   filtered: UserPermission[] = [];
   visible: UserPermission[] = [];
   searchTerm = '';
-  group: Group = 'all';
+  filter: Filter = 'all';
 
   totalUsers = 0;
   agentUsers = 0;
+  commercialUsers = 0;
   employeeUsers = 0;
 
   expandedRolesFor = new Set<string>();
   roleLabel = roleLabel;
   agentNameAr = agentNameAr;
-  isEmployeeSr = isEmployeeSr;
+  userGroup = userGroup;
 
   constructor(private usersSvc: UserPermissionsService) {}
 
@@ -39,8 +40,9 @@ export class Tab7Page implements OnInit {
     this.usersSvc.getUsers().subscribe((users) => {
       this.all = [...users].sort((a, b) => a.fullName.localeCompare(b.fullName));
       this.totalUsers = users.length;
-      this.employeeUsers = users.filter((u) => isEmployeeSr(u.srCode)).length;
-      this.agentUsers = this.totalUsers - this.employeeUsers;
+      this.agentUsers = users.filter((u) => userGroup(u.srCode) === 'agent').length;
+      this.commercialUsers = users.filter((u) => userGroup(u.srCode) === 'commercial').length;
+      this.employeeUsers = users.filter((u) => userGroup(u.srCode) === 'employee').length;
       this.applyFilters();
       this.loading = false;
     });
@@ -51,8 +53,8 @@ export class Tab7Page implements OnInit {
     this.applyFilters();
   }
 
-  setGroup(group: Group): void {
-    this.group = group;
+  setFilter(filter: Filter): void {
+    this.filter = filter;
     this.applyFilters();
   }
 
@@ -73,10 +75,8 @@ export class Tab7Page implements OnInit {
   private applyFilters(): void {
     const term = this.searchTerm;
     let list = this.all;
-    if (this.group === 'agent') {
-      list = list.filter((u) => !isEmployeeSr(u.srCode));
-    } else if (this.group === 'employee') {
-      list = list.filter((u) => isEmployeeSr(u.srCode));
+    if (this.filter !== 'all') {
+      list = list.filter((u) => userGroup(u.srCode) === this.filter);
     }
     this.filtered = !term
       ? list
