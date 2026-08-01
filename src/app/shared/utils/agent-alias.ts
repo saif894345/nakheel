@@ -12,6 +12,7 @@ const AGENT_ALIASES: Record<string, string> = {
 
   // Per the business owner: every agent below is a sub-account of AL RAFDEEN
   // (TAREEK ALOFK and INTERNET are kept separate, as instructed).
+  'API TEST': 'AL RAFDEEN',
   ALASEMAH: 'AL RAFDEEN',
   ALDHYAACO: 'AL RAFDEEN',
   ALHAEIN: 'AL RAFDEEN',
@@ -49,6 +50,7 @@ const AGENT_ALIASES: Record<string, string> = {
   RehlatAlsalateen: 'AL RAFDEEN',
   RuyatALSindibad: 'AL RAFDEEN',
   SALES: 'AL RAFDEEN',
+  Samaalasemah: 'AL RAFDEEN',
   SCHEDULE: 'AL RAFDEEN',
   'SKY SAS': 'AL RAFDEEN',
   SafirAliraq: 'AL RAFDEEN',
