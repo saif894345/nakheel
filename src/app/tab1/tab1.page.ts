@@ -363,4 +363,9 @@ export class Tab1Page implements OnInit {
   goToAgent(agent: string): void {
     this.router.navigate(['/tabs/tab3'], { queryParams: { q: agent } });
   }
+
+  get avgTransactionValue(): number {
+    if (!this.kpis || !this.kpis.approvedCount) return 0;
+    return (this.kpis.approvedAmountByCcy['IQD'] || 0) / this.kpis.approvedCount;
+  }
 }

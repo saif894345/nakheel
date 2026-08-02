@@ -17,6 +17,36 @@
       الفترة: {{ kpis.dateFrom }} إلى {{ kpis.dateTo }} · Global Aviation
     </p>
 
+    <div class="hero-banner" (click)="goToTransactions('Approved')">
+      <div class="hero-main">
+        <span class="hero-label">إجمالي المبالغ المعتمدة</span>
+        <span class="hero-value">{{ compactAmount(kpis.approvedAmountByCcy['IQD'] || 0) }}<small> د.ع</small></span>
+        <span class="hero-sub">+ {{ kpis.approvedAmountByCcy['USD'] | amountFormat:0 }} $</span>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">{{ kpis.totalTransactions | amountFormat }}</span>
+          <span class="hero-stat-label">معاملة</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">{{ kpis.approvalRate }}%</span>
+          <span class="hero-stat-label">نسبة القبول</span>
+        </div>
+        <div class="hero-stat" *ngIf="dayCompare && dayCompare.amountChangePct !== null">
+          <span
+            class="hero-stat-value hero-trend"
+            [class.up]="dayCompare.amountChangePct! >= 0"
+            [class.down]="dayCompare.amountChangePct! < 0"
+          >
+            <ion-icon [name]="dayCompare.amountChangePct! >= 0 ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
+            {{ (dayCompare.amountChangePct! >= 0 ? '+' : '') + dayCompare.amountChangePct }}%
+          </span>
+          <span class="hero-stat-label">آخر يوم</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">المطابقة المالية</h2>
     <ion-card class="chart-card reconciliation-card" *ngIf="reportInvoiceTotal">
       <ion-card-header>
         <div class="card-head-row">
@@ -48,41 +78,24 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
-      <ion-row>
-        <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">
-          <app-period-compare title="مقارنة آخر يوم باليوم الذي قبله" [data]="dayCompare"></app-period-compare>
-        </ion-col>
-        <ion-col size="12" size-md="6" *ngIf="monthCompare">
-          <app-period-compare title="مقارنة بالشهر السابق" [data]="monthCompare"></app-period-compare>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <ng-container *ngIf="dayCompare || monthCompare">
+      <h2 class="section-title">مقارنات الأداء</h2>
+      <ion-grid class="kpi-grid">
+        <ion-row>
+          <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">
+            <app-period-compare title="مقارنة آخر يوم باليوم الذي قبله" [data]="dayCompare"></app-period-compare>
+          </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="monthCompare">
+            <app-period-compare title="مقارنة بالشهر السابق" [data]="monthCompare"></app-period-compare>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ng-container>
 
+    <h2 class="section-title">تفاصيل إضافية</h2>
     <ion-grid class="kpi-grid">
       <ion-row>
-        <ion-col size="12" size-sm="6" size-lg="3">
-          <app-kpi-card
-            label="إجمالي المعاملات"
-            [value]="kpis.totalTransactions | amountFormat"
-            icon="swap-horizontal-outline"
-            color="primary"
-            [clickable]="true"
-            (cardClick)="goToTransactions('all')"
-          ></app-kpi-card>
-        </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
-          <app-kpi-card
-            label="نسبة القبول"
-            [value]="kpis.approvalRate + '%'"
-            [sub]="(kpis.approvedCount | amountFormat) + ' مقبولة'"
-            icon="checkmark-circle-outline"
-            color="success"
-            [clickable]="true"
-            (cardClick)="goToTransactions('Approved')"
-          ></app-kpi-card>
-        </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
+        <ion-col size="12" size-sm="6">
           <app-kpi-card
             label="معاملات مرفوضة"
             [value]="kpis.declinedCount | amountFormat"
@@ -92,18 +105,18 @@
             (cardClick)="goToTransactions('Declined')"
           ></app-kpi-card>
         </ion-col>
-        <ion-col size="12" size-sm="6" size-lg="3">
+        <ion-col size="12" size-sm="6">
           <app-kpi-card
-            label="إجمالي المبالغ المعتمدة"
-            [value]="compactAmount(kpis.approvedAmountByCcy['IQD'] || 0) + ' د.ع'"
-            [sub]="'+ ' + (kpis.approvedAmountByCcy['USD'] | amountFormat:0) + ' $'"
-            icon="cash-outline"
+            label="متوسط قيمة المعاملة"
+            [value]="compactAmount(avgTransactionValue) + ' د.ع'"
+            icon="calculator-outline"
             color="tertiary"
           ></app-kpi-card>
         </ion-col>
       </ion-row>
     </ion-grid>
 
+    <h2 class="section-title">الاتجاهات والتوزيع</h2>
     <ion-grid class="content-grid">
       <ion-row>
         <ion-col size="12" size-lg="8">
@@ -219,6 +232,7 @@
       </ion-row>
     </ion-grid>
 
+    <h2 class="section-title" *ngIf="topAgents.length">أفضل وأسوأ الوكلاء</h2>
     <ion-grid class="content-grid" *ngIf="topAgents.length">
       <ion-row>
         <ion-col size="12" size-md="6">
