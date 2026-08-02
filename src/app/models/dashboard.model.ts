@@ -152,7 +152,7 @@ export interface Violation {
   time: string;
   passengers: string[];
   ticketNumbers: string[];
-  /** Set when the business owner reports this case was pre-approved (e.g. by
-   * a manager) - shown as a resolved/tracked note rather than an open flag. */
+  /** An unverified claim that this case was pre-approved (e.g. by a manager) -
+   * shown alongside the case, not treated as a confirmed resolution. */
   approvalNote?: string;
 }

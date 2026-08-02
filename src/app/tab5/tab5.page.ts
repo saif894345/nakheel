@@ -32,8 +32,6 @@ export class Tab5Page implements OnInit {
   allLarge: LargeAmountFlag[] = [];
 
   visibleViolations: Violation[] = [];
-  openViolations: Violation[] = [];
-  approvedViolations: Violation[] = [];
   visibleReissues: ReissueFlag[] = [];
   visibleBursts: BurstFlag[] = [];
   visibleLarge: LargeAmountFlag[] = [];
@@ -77,23 +75,21 @@ export class Tab5Page implements OnInit {
 
   private applyFilters(): void {
     const term = this.searchTerm;
-    this.visibleViolations = !term
-      ? this.allViolations
-      : this.allViolations.filter(
-          (v) =>
-            v.pnr.toLowerCase().includes(term) ||
-            v.agent.toLowerCase().includes(term) ||
-            agentNameAr(v.agent).includes(term) ||
-            v.user.toLowerCase().includes(term) ||
-            v.passengers.some((p) => p.toLowerCase().includes(term))
-        );
     const byDateDesc = (a: Violation, b: Violation) =>
       `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`);
-    this.openViolations = this.visibleViolations
-      .filter((v) => !v.approvalNote)
-      .sort(byDateDesc);
-    this.approvedViolations = this.visibleViolations
-      .filter((v) => !!v.approvalNote)
+    this.visibleViolations = (
+      !term
+        ? this.allViolations
+        : this.allViolations.filter(
+            (v) =>
+              v.pnr.toLowerCase().includes(term) ||
+              v.agent.toLowerCase().includes(term) ||
+              agentNameAr(v.agent).includes(term) ||
+              v.user.toLowerCase().includes(term) ||
+              v.passengers.some((p) => p.toLowerCase().includes(term))
+          )
+    )
+      .slice()
       .sort(byDateDesc);
     this.visibleReissues = !term
       ? this.allReissues

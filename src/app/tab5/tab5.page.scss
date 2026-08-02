@@ -85,43 +85,8 @@
   text-align: right;
 }
 
-.violation-groups {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.group-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px 8px;
-  font-size: 14px;
-  font-weight: 700;
-
-  ion-icon {
-    font-size: 18px;
-  }
-
-  ion-badge {
-    margin-inline-start: auto;
-  }
-
-  &.open-heading {
-    color: var(--ion-color-danger);
-  }
-
-  &.approved-heading {
-    color: var(--ion-color-success);
-  }
-}
-
 .violation-card {
   border: 1px solid rgba(235, 68, 90, 0.25);
-
-  &.approved {
-    border-color: rgba(31, 157, 84, 0.3);
-  }
 }
 
 .violation-title {
@@ -129,10 +94,6 @@
   font-size: 13px;
   color: var(--ion-color-danger);
   margin-bottom: 4px;
-
-  &.approved-title {
-    color: var(--ion-color-success);
-  }
 }
 
 .violation-approval {
@@ -140,7 +101,7 @@
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  color: var(--ion-color-success);
+  color: var(--ion-color-warning-shade, #b8860b);
   margin-top: 6px;
   font-weight: 600;
 
