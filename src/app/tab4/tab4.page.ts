@@ -28,12 +28,13 @@ interface ReportPeriod {
 interface AgentReportGroup {
   agent: string;
   price: number;
-  additionalFees: number;
-  taxes: number;
+  tax: number;
+  surcharge: number;
   commission: number;
   cash: number;
   creditCard: number;
-  fromBalance: number;
+  invoice: number;
+  paxCount: number;
 }
 
 @Component({
@@ -114,12 +115,13 @@ export class Tab4Page implements OnInit {
     return {
       agent,
       price: 0,
-      additionalFees: 0,
-      taxes: 0,
+      tax: 0,
+      surcharge: 0,
       commission: 0,
       cash: 0,
       creditCard: 0,
-      fromBalance: 0,
+      invoice: 0,
+      paxCount: 0,
     };
   }
 
@@ -137,25 +139,27 @@ export class Tab4Page implements OnInit {
         map.set(r.agent, g);
       }
       g.price += r.price;
-      g.additionalFees += r.additionalFees;
-      g.taxes += r.taxes;
+      g.tax += r.tax;
+      g.surcharge += r.surcharge;
       g.commission += r.commission;
       g.cash += r.cash;
       g.creditCard += r.creditCard;
-      g.fromBalance += r.fromBalance;
+      g.invoice += r.invoice;
+      g.paxCount += r.paxCount;
     }
 
-    this.reportGroups = [...map.values()].sort((a, b) => b.price - a.price);
+    this.reportGroups = [...map.values()].sort((a, b) => b.invoice + b.price - (a.invoice + a.price));
 
     const totals = this.emptyGroup('الإجمالي');
     for (const g of this.reportGroups) {
       totals.price += g.price;
-      totals.additionalFees += g.additionalFees;
-      totals.taxes += g.taxes;
+      totals.tax += g.tax;
+      totals.surcharge += g.surcharge;
       totals.commission += g.commission;
       totals.cash += g.cash;
       totals.creditCard += g.creditCard;
-      totals.fromBalance += g.fromBalance;
+      totals.invoice += g.invoice;
+      totals.paxCount += g.paxCount;
     }
     this.reportTotals = totals;
   }
@@ -228,7 +232,7 @@ export class Tab4Page implements OnInit {
   }
 
   maxPrice(): number {
-    return this.reportGroups.reduce((m, g) => Math.max(m, g.price), 1);
+    return this.reportGroups.reduce((m, g) => Math.max(m, g.invoice + g.price), 1);
   }
 
   typeLabel(t: string): string {

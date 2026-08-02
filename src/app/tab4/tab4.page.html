@@ -124,10 +124,10 @@
 
     <!-- Agent sales report -->
     <div class="report-section">
-      <h2 class="section-title">تقرير رصيد الوكلاء</h2>
+      <h2 class="section-title">تقرير مبيعات الوكلاء (E-Ticket Report)</h2>
       <p class="hint-banner">
-        تقرير رسمي من هيتيت يوضح مبيعات كل وكيل مقسمة حسب مصدر الدفع (نقدي، بطاقة، من رصيد
-        الوكيل)، غير مرتبط بفلتر الشهر أعلاه.
+        تقرير رسمي من هيتيت يوضح مبيعات كل وكيل: السعر، العمولة، الفواتير، وطرق الدفع (نقدي،
+        بطاقة)، غير مرتبط بفلتر الشهر أعلاه.
       </p>
 
       <ion-segment [value]="selectedPeriod" (ionChange)="setPeriod($any($event.detail.value))" class="period-segment" scrollable="true">
@@ -143,9 +143,9 @@
         <ion-row>
           <ion-col size="12" size-sm="4">
             <app-kpi-card
-              label="إجمالي السعر"
-              [value]="compactAmount(reportTotals.price) + ' د.ع'"
-              icon="pricetag-outline"
+              label="إجمالي الفواتير"
+              [value]="compactAmount(reportTotals.invoice) + ' د.ع'"
+              icon="document-text-outline"
               color="primary"
             ></app-kpi-card>
           </ion-col>
@@ -159,9 +159,9 @@
           </ion-col>
           <ion-col size="12" size-sm="4">
             <app-kpi-card
-              label="من رصيد الوكلاء"
-              [value]="compactAmount(reportTotals.fromBalance) + ' د.ع'"
-              icon="wallet-outline"
+              label="عدد الركاب"
+              [value]="reportTotals.paxCount | amountFormat"
+              icon="people-outline"
               color="success"
             ></app-kpi-card>
           </ion-col>
@@ -177,21 +177,21 @@
               <ion-icon name="business-outline"></ion-icon>
               {{ g.agent | agentName }}
             </div>
-            <span class="report-price">{{ compactAmount(g.price) }} د.ع</span>
+            <span class="report-price">{{ compactAmount(g.invoice) }} د.ع</span>
           </div>
 
           <div class="emp-bar-bg">
-            <div class="emp-bar-fill" [style.width.%]="(g.price / maxPrice()) * 100"></div>
+            <div class="emp-bar-fill" [style.width.%]="((g.invoice + g.price) / maxPrice()) * 100"></div>
           </div>
 
           <div class="emp-stats">
             <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.commission) }}</span>
-              <span class="stat-label">العمولة (د.ع)</span>
+              <span class="stat-value">{{ compactAmount(g.price) }}</span>
+              <span class="stat-label">السعر (د.ع)</span>
             </div>
             <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.taxes) }}</span>
-              <span class="stat-label">الضرائب (د.ع)</span>
+              <span class="stat-value">{{ compactAmount(g.commission) }}</span>
+              <span class="stat-label">العمولة (د.ع)</span>
             </div>
             <div class="stat">
               <span class="stat-value">{{ compactAmount(g.cash) }}</span>
@@ -204,7 +204,7 @@
           </div>
 
           <p class="net-hint">
-            من رصيد الوكيل: {{ compactAmount(g.fromBalance) }} د.ع
+            عدد الركاب: {{ g.paxCount | amountFormat }}
           </p>
         </ion-card>
 

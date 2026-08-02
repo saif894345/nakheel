@@ -68,19 +68,24 @@ export interface ErrorStat {
 }
 
 /** One agent's official sales breakdown for one reporting period, from the
- * Hitit "Agent Sales Report" export - a periodic reconciliation statement,
+ * Hitit "E-Ticket Report" export - a periodic reconciliation statement,
  * not derived from transactions.json. */
 export interface AgentSalesReportRow {
   agent: string;
+  srType: string;
   periodStart: string;
   periodEnd: string;
   price: number;
-  additionalFees: number;
-  taxes: number;
+  tax: number;
+  surcharge: number;
   commission: number;
   cash: number;
   creditCard: number;
-  fromBalance: number;
+  invoice: number;
+  mco: number;
+  free: number;
+  fine: number;
+  paxCount: number;
 }
 
 export interface CashTopup {
