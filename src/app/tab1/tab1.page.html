@@ -17,35 +17,33 @@
       الفترة: {{ kpis.dateFrom }} إلى {{ kpis.dateTo }} · Global Aviation
     </p>
 
-    <ion-card class="invoice-compare-card" *ngIf="reportInvoiceTotal">
+    <ion-card class="chart-card reconciliation-card" *ngIf="reportInvoiceTotal">
+      <ion-card-header>
+        <div class="card-head-row">
+          <ion-card-title>مطابقة الفواتير والإيرادات</ion-card-title>
+          <span class="reconciliation-period" *ngIf="reportDateFrom">{{ reportDateFrom }} → {{ reportDateTo }}</span>
+        </div>
+      </ion-card-header>
       <ion-card-content>
-        <div class="invoice-compare-row">
-          <div class="invoice-compare-metric">
-            <span class="metric-label">المعتمد ببوابة الدفع (كل الفترة)</span>
-            <span class="metric-current">{{ compactAmount(approvedTotalAllTime) }} د.ع</span>
+        <div class="reconciliation-grid">
+          <div class="reconciliation-metric">
+            <span class="metric-label">المعتمد ببوابة الدفع</span>
+            <span class="metric-value">{{ compactAmount(approvedTotalAllTime) }} د.ع</span>
           </div>
-          <ion-icon name="swap-horizontal-outline" class="invoice-compare-icon"></ion-icon>
-          <div class="invoice-compare-metric">
-            <span class="metric-label">فواتير الوكلاء (تقرير هيتيت)</span>
-            <span class="metric-current">{{ compactAmount(reportInvoiceTotal) }} د.ع</span>
+          <div class="reconciliation-metric">
+            <span class="metric-label">فواتير الوكلاء (هيتيت)</span>
+            <span class="metric-value">{{ compactAmount(reportInvoiceTotal) }} د.ع</span>
+          </div>
+          <div class="reconciliation-metric">
+            <span class="metric-label">إجمالي المسافرين</span>
+            <span class="metric-value">{{ totalPaxCount | amountFormat }}</span>
           </div>
         </div>
-        <p class="invoice-compare-caption">
+        <p class="reconciliation-caption">
           الفارق: {{ compactAmount(invoiceGap) }} د.ع ({{ invoiceGapPct }}%) · غير مرتبط بفلتر الشهر أعلاه
         </p>
       </ion-card-content>
     </ion-card>
-
-    <div class="live-stats-row" *ngIf="totalPaxCount">
-      <div class="live-stat-chip">
-        <ion-icon name="people-outline"></ion-icon>
-        <div class="live-stat-text">
-          <span class="live-stat-value">{{ totalPaxCount | amountFormat }}</span>
-          <span class="live-stat-label">إجمالي المسافرين على طيران العالمية</span>
-        </div>
-      </div>
-      <span class="live-stat-period" *ngIf="reportDateFrom">{{ reportDateFrom }} → {{ reportDateTo }}</span>
-    </div>
 
     <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
       <ion-row>
