@@ -36,8 +36,6 @@ interface AgentReportGroup {
   fromBalance: number;
 }
 
-type Category = 'cash' | 'report';
-
 @Component({
   selector: 'app-tab4',
   templateUrl: 'tab4.page.html',
@@ -46,7 +44,6 @@ type Category = 'cash' | 'report';
 })
 export class Tab4Page implements OnInit {
   loading = true;
-  category: Category = 'cash';
   all: EmployeeGroup[] = [];
   visible: EmployeeGroup[] = [];
   searchTerm = '';
@@ -94,11 +91,6 @@ export class Tab4Page implements OnInit {
       this.applyFilters();
       this.loading = false;
     });
-  }
-
-  setCategory(cat: Category): void {
-    this.category = cat;
-    this.applyFilters();
   }
 
   setPeriod(period: string): void {

@@ -2,8 +2,16 @@
   padding: 4px 4px 24px;
 }
 
-.cat-segment {
-  margin: 4px 8px 8px;
+.section-title {
+  margin: 8px 12px 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.report-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--app-border-color);
+  padding-top: 12px;
 }
 
 .period-segment {
