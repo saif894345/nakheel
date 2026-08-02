@@ -172,40 +172,72 @@
 
       <div class="emp-grid">
         <ion-card class="emp-card" *ngFor="let g of visibleReportGroups">
-          <div class="emp-top">
+          <div class="emp-top" (click)="toggleReportExpand(g.agent)">
             <div class="emp-name">
               <ion-icon name="business-outline"></ion-icon>
               {{ g.agent | agentName }}
             </div>
             <span class="report-price">{{ compactAmount(g.invoice) }} د.ع</span>
+            <ion-icon
+              class="chevron"
+              [name]="expandedReportAgent === g.agent ? 'chevron-up-outline' : 'chevron-down-outline'"
+            ></ion-icon>
           </div>
 
           <div class="emp-bar-bg">
             <div class="emp-bar-fill" [style.width.%]="((g.invoice + g.price) / maxPrice()) * 100"></div>
           </div>
 
-          <div class="emp-stats">
-            <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.price) }}</span>
-              <span class="stat-label">السعر (د.ع)</span>
+          <p class="net-hint">عدد الركاب: {{ g.paxCount | amountFormat }}</p>
+
+          <div class="report-detail" *ngIf="expandedReportAgent === g.agent">
+            <div class="emp-stats">
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.price) }}</span>
+                <span class="stat-label">السعر (د.ع)</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.commission) }}</span>
+                <span class="stat-label">العمولة (د.ع)</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.tax) }}</span>
+                <span class="stat-label">الضرائب (د.ع)</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.surcharge) }}</span>
+                <span class="stat-label">الرسوم (د.ع)</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.cash) }}</span>
+                <span class="stat-label">نقدي (د.ع)</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ compactAmount(g.creditCard) }}</span>
+                <span class="stat-label">بطاقة (د.ع)</span>
+              </div>
+              <div class="stat" *ngIf="g.free">
+                <span class="stat-value">{{ compactAmount(g.free) }}</span>
+                <span class="stat-label">مجاني (د.ع)</span>
+              </div>
+              <div class="stat" *ngIf="g.fine">
+                <span class="stat-value">{{ compactAmount(g.fine) }}</span>
+                <span class="stat-label">غرامات (د.ع)</span>
+              </div>
             </div>
-            <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.commission) }}</span>
-              <span class="stat-label">العمولة (د.ع)</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.cash) }}</span>
-              <span class="stat-label">نقدي (د.ع)</span>
-            </div>
-            <div class="stat">
-              <span class="stat-value">{{ compactAmount(g.creditCard) }}</span>
-              <span class="stat-label">بطاقة (د.ع)</span>
+
+            <div class="report-users">
+              <div class="report-users-title">تفصيل حسب المستخدم (فوترة MCOINV)</div>
+              <div class="report-user-row" *ngFor="let u of expandedUserBreakdown">
+                <span class="report-user-name">{{ u.user }}</span>
+                <span class="report-user-count">{{ u.count }} عملية</span>
+                <span class="report-user-amount">{{ compactAmount(u.amount) }} د.ع</span>
+              </div>
+              <p class="report-users-empty" *ngIf="!expandedUserBreakdown.length">
+                لا توجد عمليات فوترة مطابقة لهذه الفترة
+              </p>
             </div>
           </div>
-
-          <p class="net-hint">
-            عدد الركاب: {{ g.paxCount | amountFormat }}
-          </p>
         </ion-card>
 
         <div class="empty-state" *ngIf="!visibleReportGroups.length">

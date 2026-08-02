@@ -22,6 +22,61 @@
   font-weight: 700;
   direction: ltr;
   color: var(--ion-color-primary);
+  margin-inline-start: auto;
+  margin-inline-end: 8px;
+}
+
+.report-detail {
+  margin-top: 12px;
+  border-top: 1px solid var(--app-border-color);
+  padding-top: 10px;
+}
+
+.report-users {
+  margin-top: 12px;
+}
+
+.report-users-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ion-color-medium);
+  margin-bottom: 6px;
+}
+
+.report-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--app-border-color);
+}
+
+.report-user-name {
+  direction: ltr;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-user-count {
+  color: var(--ion-color-medium);
+  flex: 0 0 auto;
+}
+
+.report-user-amount {
+  direction: ltr;
+  font-weight: 700;
+  color: var(--ion-color-success);
+  flex: 0 0 auto;
+}
+
+.report-users-empty {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 4px 0 0;
 }
 
 .hint-banner {

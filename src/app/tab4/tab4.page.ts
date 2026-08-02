@@ -7,6 +7,13 @@ import { AgentSalesReportRow, CashTopup, Transaction } from '../models/dashboard
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { computeCashTopups, filterByMonth } from '../shared/utils/aggregate';
 import { agentNameAr } from '../shared/utils/agent-display-name';
+import { canonicalAgent } from '../shared/utils/agent-alias';
+
+interface UserContribution {
+  user: string;
+  count: number;
+  amount: number;
+}
 
 interface EmployeeGroup {
   employee: string;
@@ -34,6 +41,9 @@ interface AgentReportGroup {
   cash: number;
   creditCard: number;
   invoice: number;
+  mco: number;
+  free: number;
+  fine: number;
   paxCount: number;
 }
 
@@ -62,7 +72,10 @@ export class Tab4Page implements OnInit {
   reportTotals: AgentReportGroup = this.emptyGroup('الإجمالي');
 
   private monthScopedTx: Transaction[] = [];
+  private allTx: Transaction[] = [];
   expandedEmployee: string | null = null;
+  expandedReportAgent: string | null = null;
+  expandedUserBreakdown: UserContribution[] = [];
   compactAmount = compactAmount;
 
   constructor(
@@ -77,6 +90,7 @@ export class Tab4Page implements OnInit {
       this.filterSvc.month$,
       this.reportSvc.getRows(),
     ]).subscribe(([tx, month, reportRows]) => {
+      this.allTx = tx;
       this.monthScopedTx = filterByMonth(tx, month);
       const cashTopups = computeCashTopups(this.monthScopedTx);
       this.all = this.groupByEmployee(cashTopups);
@@ -98,6 +112,9 @@ export class Tab4Page implements OnInit {
     this.selectedPeriod = period;
     this.rebuildReportGroups();
     this.applyFilters();
+    if (this.expandedReportAgent) {
+      this.expandedUserBreakdown = this.computeUserBreakdown(this.expandedReportAgent);
+    }
   }
 
   private buildPeriods(rows: AgentSalesReportRow[]): ReportPeriod[] {
@@ -121,6 +138,9 @@ export class Tab4Page implements OnInit {
       cash: 0,
       creditCard: 0,
       invoice: 0,
+      mco: 0,
+      free: 0,
+      fine: 0,
       paxCount: 0,
     };
   }
@@ -145,6 +165,9 @@ export class Tab4Page implements OnInit {
       g.cash += r.cash;
       g.creditCard += r.creditCard;
       g.invoice += r.invoice;
+      g.mco += r.mco;
+      g.free += r.free;
+      g.fine += r.fine;
       g.paxCount += r.paxCount;
     }
 
@@ -159,6 +182,9 @@ export class Tab4Page implements OnInit {
       totals.cash += g.cash;
       totals.creditCard += g.creditCard;
       totals.invoice += g.invoice;
+      totals.mco += g.mco;
+      totals.free += g.free;
+      totals.fine += g.fine;
       totals.paxCount += g.paxCount;
     }
     this.reportTotals = totals;
@@ -219,6 +245,46 @@ export class Tab4Page implements OnInit {
 
   toggleExpand(employee: string): void {
     this.expandedEmployee = this.expandedEmployee === employee ? null : employee;
+  }
+
+  toggleReportExpand(agent: string): void {
+    if (this.expandedReportAgent === agent) {
+      this.expandedReportAgent = null;
+      this.expandedUserBreakdown = [];
+      return;
+    }
+    this.expandedReportAgent = agent;
+    this.expandedUserBreakdown = this.computeUserBreakdown(agent);
+  }
+
+  private computeUserBreakdown(agent: string): UserContribution[] {
+    const period =
+      this.selectedPeriod === 'all'
+        ? { start: this.reportPeriods[0]?.start, end: this.reportPeriods[this.reportPeriods.length - 1]?.end }
+        : this.reportPeriods.find((p) => p.key === this.selectedPeriod);
+    if (!period) return [];
+
+    const rows = this.allTx.filter(
+      (t) =>
+        canonicalAgent(t.agent) === agent &&
+        t.vpos === 'MCOINV' &&
+        t.type === 'Auth' &&
+        t.currency === 'IQD' &&
+        t.date >= period.start &&
+        t.date <= period.end
+    );
+
+    const map = new Map<string, UserContribution>();
+    for (const r of rows) {
+      let u = map.get(r.user);
+      if (!u) {
+        u = { user: r.user, count: 0, amount: 0 };
+        map.set(r.user, u);
+      }
+      u.count += 1;
+      u.amount += r.amount;
+    }
+    return [...map.values()].sort((a, b) => b.amount - a.amount);
   }
 
   opsFor(employee: string): Transaction[] {

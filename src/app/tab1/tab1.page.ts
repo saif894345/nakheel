@@ -3,6 +3,7 @@ import { ChartConfiguration } from 'chart.js/auto';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
+import { AgentSalesReportService } from '../services/agent-sales-report.service';
 import { AgentStat, DashboardKpis, Transaction } from '../models/dashboard.model';
 import { compactAmount } from '../shared/pipes/amount-format.pipe';
 import { PeriodCompareData } from '../shared/period-compare/period-compare.component';
@@ -50,6 +51,9 @@ export class Tab1Page implements OnInit {
   dayCompare?: PeriodCompareData;
   monthCompare?: PeriodCompareData;
 
+  reportInvoiceTotal = 0;
+  approvedTotalAllTime = 0;
+
   private filtered: Transaction[] = [];
   private dailyData: ReturnType<typeof computeDaily> = [];
 
@@ -66,26 +70,33 @@ export class Tab1Page implements OnInit {
 
   constructor(
     private dataSvc: DashboardDataService,
-    private filterSvc: MonthFilterService
+    private filterSvc: MonthFilterService,
+    private reportSvc: AgentSalesReportService
   ) {}
 
   ngOnInit(): void {
-    combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
-      ([tx, month]) => {
-        this.filtered = filterByMonth(tx, month);
-        this.kpis = computeKpis(this.filtered);
-        this.errors = computeErrors(this.filtered);
-        this.dailyData = computeDaily(this.filtered);
-        this.buildStatusChart();
-        this.buildAgentsChart();
-        this.buildVposChart();
-        this.buildTrendChart();
-        this.buildTopBottomAgents();
-        this.buildDayCompare();
-        this.buildMonthCompare(tx, month);
-        this.loading = false;
-      }
-    );
+    combineLatest([
+      this.dataSvc.getTransactions(),
+      this.filterSvc.month$,
+      this.reportSvc.getRows(),
+    ]).subscribe(([tx, month, reportRows]) => {
+      this.filtered = filterByMonth(tx, month);
+      this.kpis = computeKpis(this.filtered);
+      this.errors = computeErrors(this.filtered);
+      this.dailyData = computeDaily(this.filtered);
+      this.buildStatusChart();
+      this.buildAgentsChart();
+      this.buildVposChart();
+      this.buildTrendChart();
+      this.buildTopBottomAgents();
+      this.buildDayCompare();
+      this.buildMonthCompare(tx, month);
+
+      this.reportInvoiceTotal = reportRows.reduce((s, r) => s + r.invoice, 0);
+      this.approvedTotalAllTime = computeKpis(tx).approvedAmountByCcy['IQD'] || 0;
+
+      this.loading = false;
+    });
   }
 
   private buildTopBottomAgents(): void {
@@ -311,5 +322,14 @@ export class Tab1Page implements OnInit {
   errorPercent(count: number): number {
     if (!this.kpis || !this.kpis.declinedCount) return 0;
     return Math.round((count / this.kpis.declinedCount) * 100);
+  }
+
+  get invoiceGap(): number {
+    return this.approvedTotalAllTime - this.reportInvoiceTotal;
+  }
+
+  get invoiceGapPct(): number {
+    if (!this.approvedTotalAllTime) return 0;
+    return Math.round((this.invoiceGap / this.approvedTotalAllTime) * 1000) / 10;
   }
 }

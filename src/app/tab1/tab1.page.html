@@ -17,6 +17,25 @@
       الفترة: {{ kpis.dateFrom }} إلى {{ kpis.dateTo }} · Global Aviation
     </p>
 
+    <ion-card class="invoice-compare-card" *ngIf="reportInvoiceTotal">
+      <ion-card-content>
+        <div class="invoice-compare-row">
+          <div class="invoice-compare-metric">
+            <span class="metric-label">المعتمد ببوابة الدفع (كل الفترة)</span>
+            <span class="metric-current">{{ compactAmount(approvedTotalAllTime) }} د.ع</span>
+          </div>
+          <ion-icon name="swap-horizontal-outline" class="invoice-compare-icon"></ion-icon>
+          <div class="invoice-compare-metric">
+            <span class="metric-label">فواتير الوكلاء (تقرير هيتيت)</span>
+            <span class="metric-current">{{ compactAmount(reportInvoiceTotal) }} د.ع</span>
+          </div>
+        </div>
+        <p class="invoice-compare-caption">
+          الفارق: {{ compactAmount(invoiceGap) }} د.ع ({{ invoiceGapPct }}%) · غير مرتبط بفلتر الشهر أعلاه
+        </p>
+      </ion-card-content>
+    </ion-card>
+
     <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
       <ion-row>
         <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">
