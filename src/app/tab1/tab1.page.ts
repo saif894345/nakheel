@@ -53,6 +53,9 @@ export class Tab1Page implements OnInit {
 
   reportInvoiceTotal = 0;
   approvedTotalAllTime = 0;
+  totalPaxCount = 0;
+  reportDateFrom = '';
+  reportDateTo = '';
 
   private filtered: Transaction[] = [];
   private dailyData: ReturnType<typeof computeDaily> = [];
@@ -93,7 +96,18 @@ export class Tab1Page implements OnInit {
       this.buildMonthCompare(tx, month);
 
       this.reportInvoiceTotal = reportRows.reduce((s, r) => s + r.invoice, 0);
+      this.totalPaxCount = reportRows.reduce((s, r) => s + r.paxCount, 0);
       this.approvedTotalAllTime = computeKpis(tx).approvedAmountByCcy['IQD'] || 0;
+      if (reportRows.length) {
+        this.reportDateFrom = reportRows.reduce(
+          (min, r) => (r.periodStart < min ? r.periodStart : min),
+          reportRows[0].periodStart
+        );
+        this.reportDateTo = reportRows.reduce(
+          (max, r) => (r.periodEnd > max ? r.periodEnd : max),
+          reportRows[0].periodEnd
+        );
+      }
 
       this.loading = false;
     });

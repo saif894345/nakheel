@@ -36,6 +36,17 @@
       </ion-card-content>
     </ion-card>
 
+    <div class="live-stats-row" *ngIf="totalPaxCount">
+      <div class="live-stat-chip">
+        <ion-icon name="people-outline"></ion-icon>
+        <div class="live-stat-text">
+          <span class="live-stat-value">{{ totalPaxCount | amountFormat }}</span>
+          <span class="live-stat-label">إجمالي المسافرين على طيران العالمية</span>
+        </div>
+      </div>
+      <span class="live-stat-period" *ngIf="reportDateFrom">{{ reportDateFrom }} → {{ reportDateTo }}</span>
+    </div>
+
     <ion-grid class="kpi-grid" *ngIf="dayCompare || monthCompare">
       <ion-row>
         <ion-col size="12" [attr.size-md]="monthCompare ? 6 : 12">

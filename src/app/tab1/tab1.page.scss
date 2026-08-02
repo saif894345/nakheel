@@ -57,6 +57,54 @@
   color: var(--ion-color-medium);
 }
 
+.live-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 4px 12px;
+}
+
+.live-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ion-card-background, #fff);
+  border: 1px solid var(--app-border-color);
+  border-radius: 12px;
+  padding: 8px 12px;
+
+  ion-icon {
+    font-size: 22px;
+    color: var(--ion-color-success);
+    flex: 0 0 auto;
+  }
+}
+
+.live-stat-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.live-stat-value {
+  font-weight: 700;
+  font-size: 15px;
+  direction: ltr;
+  text-align: start;
+}
+
+.live-stat-label {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+}
+
+.live-stat-period {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+  direction: ltr;
+}
+
 .chart-card {
   margin: 0 0 12px;
 }
