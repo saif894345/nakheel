@@ -74,29 +74,65 @@
     </ion-segment>
 
     <!-- Confirmed violations -->
-    <div class="list-wrap" *ngIf="category === 'violation'">
-      <div class="result-count">{{ visibleViolations.length }} حالة</div>
-      <ion-card class="flag-card violation-card" [class.approved]="v.approvalNote" *ngFor="let v of visibleViolations">
-        <div class="flag-top">
-          <span class="flag-pnr">{{ v.pnr }}</span>
-          <ion-badge [color]="v.approvalNote ? 'success' : 'danger'">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
+    <div class="violation-groups" *ngIf="category === 'violation'">
+      <div class="violation-group" *ngIf="openViolations.length">
+        <div class="group-heading open-heading">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <span>حالات مفتوحة تحتاج مراجعة</span>
+          <ion-badge color="danger">{{ openViolations.length }}</ion-badge>
         </div>
-        <div class="violation-title" [class.approved-title]="v.approvalNote">{{ v.title }}</div>
-        <div class="flag-mid">
-          <span>{{ v.agent | agentName }}</span>
-          <span class="flag-user">{{ v.user }}</span>
+        <div class="list-wrap">
+          <ion-card class="flag-card violation-card" *ngFor="let v of openViolations">
+            <div class="flag-top">
+              <span class="flag-pnr">{{ v.pnr }}</span>
+              <ion-badge color="danger">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
+            </div>
+            <div class="violation-title">{{ v.title }}</div>
+            <div class="flag-mid">
+              <span>{{ v.agent | agentName }}</span>
+              <span class="flag-user">{{ v.user }}</span>
+            </div>
+            <p class="violation-desc">{{ v.description }}</p>
+            <div class="violation-passengers" *ngIf="v.passengers.length">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>{{ v.passengers.join(' · ') }}</span>
+            </div>
+            <div class="flag-gap">{{ v.date }} · {{ v.time }}</div>
+          </ion-card>
         </div>
-        <p class="violation-desc">{{ v.description }}</p>
-        <div class="violation-passengers" *ngIf="v.passengers.length">
-          <ion-icon name="people-outline"></ion-icon>
-          <span>{{ v.passengers.join(' · ') }}</span>
-        </div>
-        <div class="violation-approval" *ngIf="v.approvalNote">
+      </div>
+
+      <div class="violation-group" *ngIf="approvedViolations.length">
+        <div class="group-heading approved-heading">
           <ion-icon name="checkmark-circle-outline"></ion-icon>
-          <span>{{ v.approvalNote }}</span>
+          <span>حالات معتمدة / محلولة</span>
+          <ion-badge color="success">{{ approvedViolations.length }}</ion-badge>
         </div>
-        <div class="flag-gap">{{ v.date }} · {{ v.time }}</div>
-      </ion-card>
+        <div class="list-wrap">
+          <ion-card class="flag-card violation-card approved" *ngFor="let v of approvedViolations">
+            <div class="flag-top">
+              <span class="flag-pnr">{{ v.pnr }}</span>
+              <ion-badge color="success">{{ v.amount | amountFormat }} {{ v.currency }}</ion-badge>
+            </div>
+            <div class="violation-title approved-title">{{ v.title }}</div>
+            <div class="flag-mid">
+              <span>{{ v.agent | agentName }}</span>
+              <span class="flag-user">{{ v.user }}</span>
+            </div>
+            <p class="violation-desc">{{ v.description }}</p>
+            <div class="violation-passengers" *ngIf="v.passengers.length">
+              <ion-icon name="people-outline"></ion-icon>
+              <span>{{ v.passengers.join(' · ') }}</span>
+            </div>
+            <div class="violation-approval">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ v.approvalNote }}</span>
+            </div>
+            <div class="flag-gap">{{ v.date }} · {{ v.time }}</div>
+          </ion-card>
+        </div>
+      </div>
+
       <div class="empty-state" *ngIf="!visibleViolations.length">
         <ion-icon name="checkmark-done-outline"></ion-icon>
         <p>لا توجد مخالفات موثقة مطابقة</p>

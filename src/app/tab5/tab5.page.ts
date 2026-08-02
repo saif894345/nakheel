@@ -32,6 +32,8 @@ export class Tab5Page implements OnInit {
   allLarge: LargeAmountFlag[] = [];
 
   visibleViolations: Violation[] = [];
+  openViolations: Violation[] = [];
+  approvedViolations: Violation[] = [];
   visibleReissues: ReissueFlag[] = [];
   visibleBursts: BurstFlag[] = [];
   visibleLarge: LargeAmountFlag[] = [];
@@ -85,6 +87,14 @@ export class Tab5Page implements OnInit {
             v.user.toLowerCase().includes(term) ||
             v.passengers.some((p) => p.toLowerCase().includes(term))
         );
+    const byDateDesc = (a: Violation, b: Violation) =>
+      `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`);
+    this.openViolations = this.visibleViolations
+      .filter((v) => !v.approvalNote)
+      .sort(byDateDesc);
+    this.approvedViolations = this.visibleViolations
+      .filter((v) => !!v.approvalNote)
+      .sort(byDateDesc);
     this.visibleReissues = !term
       ? this.allReissues
       : this.allReissues.filter(
