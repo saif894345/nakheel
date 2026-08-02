@@ -54,8 +54,8 @@
   },
   {
     "pnr": "11LRY7",
-    "title": "نقل تحصيل حجز جماعي من حساب SALES إلى حساب REVENUE بموافقة صاحب العمل",
-    "description": "5 تذاكر بغداد-بيروت-بغداد (رحلتي IG 111/IG 112) بإجمالي فعلي 2,615,830 د.ع. حُجزت مبدئياً عبر حساب SALES/OLAS نقداً بمبلغ 3,262,840 د.ع بتاريخ 10-07-2026، ثم أُلغي جزء من المبلغ (رد 3,234,720 د.ع) وأُعيد تحصيل القيمة الفعلية للتذاكر (2,615,830 د.ع - مطابقة تماماً لإجمالي التذاكر) عبر حساب REVENUE/AYAG بتاريخ 11-07-2026.",
+    "title": "5 تذاكر مجانية مسجلة كدفعة نقدية عبر حساب REVENUE بعد نقلها من حساب SALES",
+    "description": "5 تذاكر بغداد-بيروت-بغداد (رحلتي IG 111/IG 112) بإجمالي فعلي 2,615,830 د.ع، حسب توضيح صاحب العمل هي تذاكر مجانية بموافقته عبر المستخدم AYA. حُجزت مبدئياً عبر حساب SALES/OLAS نقداً بمبلغ 3,262,840 د.ع بتاريخ 10-07-2026، ثم أُلغي جزء من المبلغ (رد 3,234,720 د.ع) وأُعيد تحصيل كامل قيمة التذاكر (2,615,830 د.ع) نقداً عبر حساب REVENUE/AYAG بتاريخ 11-07-2026 - رغم كونها مجانية حسب توضيح صاحب العمل.",
     "agent": "REVENUE",
     "user": "AYAG",
     "amount": 2615830,
@@ -64,7 +64,7 @@
     "time": "12:42:45",
     "passengers": ["ALBU FARADI/MUAYAD MR", "ALBU FARADI/MALIK MR", "ALBU FARADI/KHALID MR", "AL OBAIDI/SALIM MR", "AL ASADI/MOHAMMED MR"],
     "ticketNumbers": ["999 2400064382", "999 2400064383", "999 2400064384", "999 2400064385", "999 2400064386"],
-    "approvalNote": "حجز بموافقة صاحب العمل (الشيخ)"
+    "approvalNote": "تذاكر مجانية بموافقة صاحب العمل (الشيخ) - يوزر آية"
   },
   {
     "pnr": "11LQAJ",
@@ -213,5 +213,61 @@
     "time": "12:35:11",
     "passengers": ["FAYYADH/SAADOON MR", "ALI/HASAN MR", "AL ZUBAIDI/NAWAL MRS", "SAADOON/GHAITH MR"],
     "ticketNumbers": ["999 2400073377", "999 2400073378", "999 2400073379", "999 2400073380"]
+  },
+  {
+    "pnr": "11LT87",
+    "title": "تذكرة مجانية مسجلة كدفعة نقدية كاملة عبر حساب REVENUE",
+    "description": "تذكرة بيروت-بغداد-بيروت (رحلتي IG 112/IG 111) للراكبة CHALHOUB/FARAH MRS، حسب توضيح صاحب العمل هي تذكرة مجانية بموافقة مدير التجارية عبر المستخدم AYA. السجل يُظهر تحصيل كامل قيمتها نقداً (469,312 د.ع) بتاريخ 18-07-2026 عبر حساب REVENUE/AYAG.",
+    "agent": "REVENUE",
+    "user": "AYAG",
+    "amount": 469312,
+    "currency": "IQD",
+    "date": "2026-07-18",
+    "time": "13:37:35",
+    "passengers": ["CHALHOUB/FARAH MRS"],
+    "ticketNumbers": ["999 2400069931"],
+    "approvalNote": "تذكرة مجانية بموافقة مدير التجارية (يوزر آية)"
+  },
+  {
+    "pnr": "11LP8N",
+    "title": "4 تذاكر مجانية مسجلة كدفعة نقدية كاملة عبر حساب REVENUE",
+    "description": "4 تذاكر لعائلة واحدة للراكبين ALWAN/AMAL MRS، ALNASSERY/JAWDAT MR، ALSAMMARRAIE/ZINA MRS، ALWAN/EMAN MRS، حسب توضيح صاحب العمل هي تذاكر مجانية بموافقة مدير التجارية. السجل يُظهر تحصيل كامل قيمتها نقداً (612,222 د.ع لكل راكب، 2,448,888 د.ع إجمالاً) بتاريخ 28-06-2026 عبر حساب REVENUE/AYAG.",
+    "agent": "REVENUE",
+    "user": "AYAG",
+    "amount": 2448888,
+    "currency": "IQD",
+    "date": "2026-06-28",
+    "time": "15:18:04",
+    "passengers": ["ALWAN/AMAL MRS", "ALNASSERY/JAWDAT MR", "ALSAMMARRAIE/ZINA MRS", "ALWAN/EMAN MRS"],
+    "ticketNumbers": ["999 2400053351", "999 2400053352", "999 2400053353", "999 2400053354"],
+    "approvalNote": "تذاكر مجانية بموافقة مدير التجارية"
+  },
+  {
+    "pnr": "11LMLG",
+    "title": "حجز لمسافري وكيل خارجي (الواحة) دُفع عبر حساب REVENUE الداخلي بدلاً من حساب الوكيل",
+    "description": "تذكرتا الراكبين ALDHAYE/ABBAS MR و ALMAJMAIE/MUSTAFA MR (438,688 د.ع لكل تذكرة، 877,376 د.ع إجمالاً)، حسب توضيح صاحب العمل هما مسافران فعلياً من طرف وكيل خارجي (الواحة)، لكن تم تحصيل قيمة تذكرتيهما نقداً عبر حساب REVENUE/AYAG الداخلي بتاريخ 17-06-2026 بدلاً من حساب وكيل الواحة.",
+    "agent": "REVENUE",
+    "user": "AYAG",
+    "amount": 877376,
+    "currency": "IQD",
+    "date": "2026-06-17",
+    "time": "14:42:11",
+    "passengers": ["ALDHAYE/ABBAS MR", "ALMAJMAIE/MUSTAFA MR"],
+    "ticketNumbers": ["999 2400045384", "999 2400045385"],
+    "approvalNote": "دفع عبر حساب آية بموافقة مدير التجارية"
+  },
+  {
+    "pnr": "11KH20",
+    "title": "حجز جماعي (30 راكباً) لعملاء وكيل خارجي (الواحة) دُفع بالكامل عبر حساب REVENUE",
+    "description": "حجز جماعي من 30 راكباً بغداد-بيروت-بغداد (رحلتي IG 111/IG 112)، كل تذكرة بقيمة 429,712 د.ع (إجمالي 12,891,360 د.ع)، حسب توضيح صاحب العمل هم مسافرون فعلياً من طرف وكيل خارجي (الواحة). صدرت 27 تذكرة وحُصّل كامل المبلغ نقداً عبر حساب REVENUE/AYAG بتاريخ 18-05-2026، ثم أُعيد إصدار 3 تذاكر إضافية لنفس الحجز بعد يومين (20-05-2026) دون تحصيل إضافي (NO ADC) - حسب توضيح صاحب العمل: بعد إعادة فتح النظام، بموافقة مدير التجارية.",
+    "agent": "REVENUE",
+    "user": "AYAG",
+    "amount": 12891360,
+    "currency": "IQD",
+    "date": "2026-05-18",
+    "time": "16:43:45",
+    "passengers": ["BAREM/MAYSAM MRS", "ALJUMAILI/HALAH MRS", "HUSSEIN/SABREEN MRS", "TALIB/ABDULLAH MR", "HADI/KARRAR MR", "SWAYEDI/GHADEER MRS", "HATAWA/HAWRAA MRS", "SOLO/ABDULSALAM MR", "ALAZZAWI/ZAHRAA MRS", "AMEEN/QANAT MRS", "ABDULSATTAR/HUDHAIFA MR", "MOHAMMED/MOHAMMED MR", "MOHAMMED/AIHAM MR", "BANISAIF/ALI MR", "ALKINANI/ALI MR", "ALSREIWE/ALI MR", "SABUT/MAJIDA MRS", "HAMEED/MUSTAFA MR", "SAEED/RANIAH MRS", "HAMEED/HUSSEIN MR", "HAMEED/SAJJAD MR", "BREESAM/WALEED MR", "ALFURAIJAT/MUQTADA MR", "AJEEL/SAMER MR", "ALBEHADILI/HAYDER MR", "AL EDHARI/AHMED MR", "HAMMOOD/ZUHAIR MR", "KHAMMAS/HUSSEIN MR", "ALSHAREEFI/AHMED MR", "ALJUMAILI/HARITH MR"],
+    "ticketNumbers": ["999 2400018000", "999 2400018001", "999 2400018002", "999 2400018003", "999 2400018004", "999 2400018005", "999 2400018006", "999 2400018007", "999 2400018008", "999 2400018009", "999 2400018010", "999 2400018011", "999 2400018012", "999 2400018013", "999 2400018014", "999 2400018015", "999 2400018016", "999 2400018017", "999 2400018018", "999 2400018019", "999 2400018020", "999 2400018021", "999 2400018022", "999 2400018023", "999 2400018024", "999 2400018025", "999 2400018029", "999 2400030800", "999 2400031000", "999 2400031200"],
+    "approvalNote": "دفع نقداً بموافقة مدير التجارية لشركة الواحة بعد إعادة فتح النظام بيومين"
   }
 ]
