@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChartConfiguration } from 'chart.js/auto';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
@@ -74,7 +75,8 @@ export class Tab1Page implements OnInit {
   constructor(
     private dataSvc: DashboardDataService,
     private filterSvc: MonthFilterService,
-    private reportSvc: AgentSalesReportService
+    private reportSvc: AgentSalesReportService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -345,5 +347,20 @@ export class Tab1Page implements OnInit {
   get invoiceGapPct(): number {
     if (!this.approvedTotalAllTime) return 0;
     return Math.round((this.invoiceGap / this.approvedTotalAllTime) * 1000) / 10;
+  }
+
+  get invoiceGapLevel(): 'ok' | 'warn' | 'high' {
+    const pct = Math.abs(this.invoiceGapPct);
+    if (pct < 10) return 'ok';
+    if (pct < 25) return 'warn';
+    return 'high';
+  }
+
+  goToTransactions(status: 'all' | 'Approved' | 'Declined'): void {
+    this.router.navigate(['/tabs/tab2'], { queryParams: status === 'all' ? {} : { status } });
+  }
+
+  goToAgent(agent: string): void {
+    this.router.navigate(['/tabs/tab3'], { queryParams: { q: agent } });
   }
 }

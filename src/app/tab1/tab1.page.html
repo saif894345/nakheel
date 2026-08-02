@@ -39,7 +39,10 @@
             <span class="metric-value">{{ totalPaxCount | amountFormat }}</span>
           </div>
         </div>
-        <p class="reconciliation-caption">
+        <p class="reconciliation-caption" [class]="'gap-' + invoiceGapLevel">
+          <ion-icon
+            [name]="invoiceGapLevel === 'ok' ? 'checkmark-circle-outline' : 'alert-circle-outline'"
+          ></ion-icon>
           الفارق: {{ compactAmount(invoiceGap) }} د.ع ({{ invoiceGapPct }}%) · غير مرتبط بفلتر الشهر أعلاه
         </p>
       </ion-card-content>
@@ -64,6 +67,8 @@
             [value]="kpis.totalTransactions | amountFormat"
             icon="swap-horizontal-outline"
             color="primary"
+            [clickable]="true"
+            (cardClick)="goToTransactions('all')"
           ></app-kpi-card>
         </ion-col>
         <ion-col size="12" size-sm="6" size-lg="3">
@@ -73,6 +78,8 @@
             [sub]="(kpis.approvedCount | amountFormat) + ' مقبولة'"
             icon="checkmark-circle-outline"
             color="success"
+            [clickable]="true"
+            (cardClick)="goToTransactions('Approved')"
           ></app-kpi-card>
         </ion-col>
         <ion-col size="12" size-sm="6" size-lg="3">
@@ -81,6 +88,8 @@
             [value]="kpis.declinedCount | amountFormat"
             icon="close-circle-outline"
             color="danger"
+            [clickable]="true"
+            (cardClick)="goToTransactions('Declined')"
           ></app-kpi-card>
         </ion-col>
         <ion-col size="12" size-sm="6" size-lg="3">
@@ -218,7 +227,7 @@
               <ion-card-title>أعلى 5 وكلاء إيراداً</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <div class="rank-row" *ngFor="let a of topAgents; let i = index">
+              <div class="rank-row" *ngFor="let a of topAgents; let i = index" (click)="goToAgent(a.agent)">
                 <span class="rank-num success">{{ i + 1 }}</span>
                 <span class="rank-name">{{ a.agent | agentName }}</span>
                 <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>
@@ -233,7 +242,7 @@
               <ion-card-title>أقل 5 وكلاء إيراداً</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <div class="rank-row" *ngFor="let a of bottomAgents; let i = index">
+              <div class="rank-row" *ngFor="let a of bottomAgents; let i = index" (click)="goToAgent(a.agent)">
                 <span class="rank-num danger">{{ i + 1 }}</span>
                 <span class="rank-name">{{ a.agent | agentName }}</span>
                 <span class="rank-amount">{{ compactAmount(a.amountIQD) }} د.ع</span>

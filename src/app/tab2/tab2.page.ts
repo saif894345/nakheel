@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
@@ -29,10 +30,17 @@ export class Tab2Page implements OnInit {
 
   constructor(
     private dataSvc: DashboardDataService,
-    private filterSvc: MonthFilterService
+    private filterSvc: MonthFilterService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    const status = qp.get('status');
+    if (status === 'Approved' || status === 'Declined') {
+      this.statusFilter = status;
+    }
+
     combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
       ([tx, month]) => {
         this.all = [...tx].sort((a, b) => (a.date + a.time < b.date + b.time ? 1 : -1));

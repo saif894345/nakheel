@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { DashboardDataService } from '../services/dashboard-data.service';
 import { MonthFilterService } from '../services/month-filter.service';
@@ -38,10 +39,16 @@ export class Tab3Page implements OnInit {
 
   constructor(
     private dataSvc: DashboardDataService,
-    private filterSvc: MonthFilterService
+    private filterSvc: MonthFilterService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const q = this.route.snapshot.queryParamMap.get('q');
+    if (q) {
+      this.searchTerm = q.trim().toLowerCase();
+    }
+
     combineLatest([this.dataSvc.getTransactions(), this.filterSvc.month$]).subscribe(
       ([tx, month]) => {
         this.monthScopedTx = filterByMonth(tx, month);

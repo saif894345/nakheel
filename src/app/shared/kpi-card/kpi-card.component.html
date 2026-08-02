@@ -1,4 +1,4 @@
-<div class="kpi-card" [class]="'kpi-' + color">
+<div class="kpi-card" [class]="'kpi-' + color" [class.kpi-clickable]="clickable" (click)="onClick()">
   <div class="kpi-icon">
     <ion-icon [name]="icon"></ion-icon>
   </div>

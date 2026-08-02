@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-kpi-card',
@@ -13,4 +13,10 @@ export class KpiCardComponent {
   @Input() icon = 'stats-chart-outline';
   @Input() color: 'primary' | 'success' | 'danger' | 'warning' | 'tertiary' = 'primary';
   @Input() trend?: 'up' | 'down' | null = null;
+  @Input() clickable = false;
+  @Output() cardClick = new EventEmitter<void>();
+
+  onClick(): void {
+    if (this.clickable) this.cardClick.emit();
+  }
 }

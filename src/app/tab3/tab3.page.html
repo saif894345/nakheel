@@ -6,6 +6,7 @@
   <ion-toolbar>
     <ion-searchbar
       placeholder="ابحث باسم الوكيل أو المستخدم"
+      [value]="searchTerm"
       (ionInput)="onSearch($event)"
       debounce="250"
     ></ion-searchbar>
