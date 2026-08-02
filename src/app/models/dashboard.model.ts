@@ -67,6 +67,22 @@ export interface ErrorStat {
   count: number;
 }
 
+/** One agent's official sales breakdown for one reporting period, from the
+ * Hitit "Agent Sales Report" export - a periodic reconciliation statement,
+ * not derived from transactions.json. */
+export interface AgentSalesReportRow {
+  agent: string;
+  periodStart: string;
+  periodEnd: string;
+  price: number;
+  additionalFees: number;
+  taxes: number;
+  commission: number;
+  cash: number;
+  creditCard: number;
+  fromBalance: number;
+}
+
 export interface CashTopup {
   employee: string;
   agent: string;

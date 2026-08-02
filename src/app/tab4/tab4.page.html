@@ -1,11 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>تعزيزات الرصيد</ion-title>
-    <app-month-select slot="end"></app-month-select>
+    <app-month-select slot="end" *ngIf="category === 'cash'"></app-month-select>
   </ion-toolbar>
   <ion-toolbar>
     <ion-searchbar
-      placeholder="ابحث باسم الموظف أو القسم"
+      placeholder="ابحث باسم الوكيل أو الموظف"
       (ionInput)="onSearch($event)"
       debounce="250"
     ></ion-searchbar>
@@ -14,12 +14,25 @@
 
 <ion-content>
   <div class="page-wrap" *ngIf="!loading">
-    <p class="hint-banner">
+    <ion-segment [value]="category" (ionChange)="setCategory($any($event.detail.value))" class="cat-segment">
+      <ion-segment-button value="cash">
+        <ion-label>تعزيزات نقدية</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="report">
+        <ion-label>تقرير رصيد الوكلاء</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <p class="hint-banner" *ngIf="category === 'cash'">
       تعزيزات الرصيد هي العمليات النقدية (CASH) التي ينفذها الموظفون على حسابات
       الأقسام/الوكلاء الداخليين.
     </p>
+    <p class="hint-banner" *ngIf="category === 'report'">
+      تقرير رسمي من هيتيت يوضح مبيعات كل وكيل مقسمة حسب مصدر الدفع (نقدي، بطاقة، من رصيد
+      الوكيل)، غير مرتبط بفلتر الشهر أعلاه.
+    </p>
 
-    <ion-grid class="kpi-grid">
+    <ion-grid class="kpi-grid" *ngIf="category === 'cash'">
       <ion-row>
         <ion-col size="12" size-sm="4">
           <app-kpi-card
@@ -49,9 +62,9 @@
       </ion-row>
     </ion-grid>
 
-    <div class="result-count">{{ visible.length }} من أصل {{ all.length }} موظف</div>
+    <div class="result-count" *ngIf="category === 'cash'">{{ visible.length }} من أصل {{ all.length }} موظف</div>
 
-    <div class="emp-grid">
+    <div class="emp-grid" *ngIf="category === 'cash'">
       <ion-card class="emp-card" *ngFor="let g of visible">
         <div class="emp-top" (click)="toggleExpand(g.employee)">
           <div class="emp-name">
@@ -118,6 +131,93 @@
       <div class="empty-state" *ngIf="!visible.length">
         <ion-icon name="wallet-outline"></ion-icon>
         <p>لا توجد نتائج مطابقة</p>
+      </div>
+    </div>
+
+    <!-- Agent sales report -->
+    <div *ngIf="category === 'report'">
+      <ion-segment [value]="selectedPeriod" (ionChange)="setPeriod($any($event.detail.value))" class="period-segment" scrollable="true">
+        <ion-segment-button value="all">
+          <ion-label>كل الفترات</ion-label>
+        </ion-segment-button>
+        <ion-segment-button [value]="p.key" *ngFor="let p of reportPeriods">
+          <ion-label>{{ p.start }} → {{ p.end }}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <ion-grid class="kpi-grid">
+        <ion-row>
+          <ion-col size="12" size-sm="4">
+            <app-kpi-card
+              label="إجمالي السعر"
+              [value]="compactAmount(reportTotals.price) + ' د.ع'"
+              icon="pricetag-outline"
+              color="primary"
+            ></app-kpi-card>
+          </ion-col>
+          <ion-col size="12" size-sm="4">
+            <app-kpi-card
+              label="إجمالي العمولة"
+              [value]="compactAmount(reportTotals.commission) + ' د.ع'"
+              icon="cash-outline"
+              color="tertiary"
+            ></app-kpi-card>
+          </ion-col>
+          <ion-col size="12" size-sm="4">
+            <app-kpi-card
+              label="من رصيد الوكلاء"
+              [value]="compactAmount(reportTotals.fromBalance) + ' د.ع'"
+              icon="wallet-outline"
+              color="success"
+            ></app-kpi-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <div class="result-count">{{ visibleReportGroups.length }} وكيل</div>
+
+      <div class="emp-grid">
+        <ion-card class="emp-card" *ngFor="let g of visibleReportGroups">
+          <div class="emp-top">
+            <div class="emp-name">
+              <ion-icon name="business-outline"></ion-icon>
+              {{ g.agent | agentName }}
+            </div>
+            <span class="report-price">{{ compactAmount(g.price) }} د.ع</span>
+          </div>
+
+          <div class="emp-bar-bg">
+            <div class="emp-bar-fill" [style.width.%]="(g.price / maxPrice()) * 100"></div>
+          </div>
+
+          <div class="emp-stats">
+            <div class="stat">
+              <span class="stat-value">{{ compactAmount(g.commission) }}</span>
+              <span class="stat-label">العمولة (د.ع)</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ compactAmount(g.taxes) }}</span>
+              <span class="stat-label">الضرائب (د.ع)</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ compactAmount(g.cash) }}</span>
+              <span class="stat-label">نقدي (د.ع)</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ compactAmount(g.creditCard) }}</span>
+              <span class="stat-label">بطاقة (د.ع)</span>
+            </div>
+          </div>
+
+          <p class="net-hint">
+            من رصيد الوكيل: {{ compactAmount(g.fromBalance) }} د.ع
+          </p>
+        </ion-card>
+
+        <div class="empty-state" *ngIf="!visibleReportGroups.length">
+          <ion-icon name="business-outline"></ion-icon>
+          <p>لا توجد نتائج مطابقة</p>
+        </div>
       </div>
     </div>
   </div>

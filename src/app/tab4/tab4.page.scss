@@ -2,6 +2,20 @@
   padding: 4px 4px 24px;
 }
 
+.cat-segment {
+  margin: 4px 8px 8px;
+}
+
+.period-segment {
+  margin: 4px 8px 12px;
+}
+
+.report-price {
+  font-weight: 700;
+  direction: ltr;
+  color: var(--ion-color-primary);
+}
+
 .hint-banner {
   margin: 8px 12px;
   font-size: 12.5px;
